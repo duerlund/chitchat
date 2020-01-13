@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!-- Facebook application ID and custom URL scheme (app ID prefixed by 'fb'). -->
+  <string name="facebook_application_id" translatable="false">2134847336618666</string>
+  <string name="facebook_login_protocol_scheme" translatable="false">fb2134847336618666</string>
+</resources>

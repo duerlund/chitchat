@@ -13,10 +13,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import dk.lysesort.chitchat.R;
+import dk.lysesort.chitchat.login.LoginViewModel;
 
 public class ChatRoomListFragment extends Fragment {
 
-    private ChatRoomListViewModel mViewModel;
+    private ChatRoomListViewModel viewModel;
 
     public static ChatRoomListFragment newInstance() {
         return new ChatRoomListFragment();
@@ -31,7 +32,8 @@ public class ChatRoomListFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = ViewModelProviders.of(this).get(ChatRoomListViewModel.class);
-        // TODO: Use the ViewModel
+        viewModel = ViewModelProviders.of(this).get(ChatRoomListViewModel.class);
+        LoginViewModel l = new LoginViewModel();
+        l.onSignOut(getContext());
     }
 }
