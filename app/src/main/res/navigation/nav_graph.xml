@@ -11,5 +11,16 @@
       android:name="dk.lysesort.chitchat.login.LoginFragment"
       android:label="login_fragment"
       tools:layout="@layout/login_fragment"
+      >
+    <action
+        android:id="@+id/action_loginFragment_to_chatRoomListFragment"
+        app:destination="@id/chatRoomListFragment"
+        />
+  </fragment>
+  <fragment
+      android:id="@+id/chatRoomListFragment"
+      android:name="dk.lysesort.chitchat.chatroomlist.ChatRoomListFragment"
+      android:label="chat_room_list_fragment"
+      tools:layout="@layout/chat_room_list_fragment"
       />
 </navigation>

@@ -1,4 +1,4 @@
-package dk.lysesort.chitchat.login;
+package dk.lysesort.chitchat.chatroomlist;
 
 import androidx.lifecycle.ViewModelProviders;
 
@@ -12,35 +12,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.navigation.Navigation;
 import dk.lysesort.chitchat.R;
 
-public class LoginFragment extends Fragment {
+public class ChatRoomListFragment extends Fragment {
 
-    private LoginViewModel viewModel;
+    private ChatRoomListViewModel mViewModel;
 
-    public static LoginFragment newInstance() {
-        return new LoginFragment();
+    public static ChatRoomListFragment newInstance() {
+        return new ChatRoomListFragment();
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
         @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.login_fragment, container, false);
+        return inflater.inflate(R.layout.chat_room_list_fragment, container, false);
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        viewModel = ViewModelProviders.of(this).get(LoginViewModel.class);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        if (!viewModel.showLogin()) {
-            Navigation.findNavController(getView()).navigate(R.id.action_loginFragment_to_chatRoomListFragment);
-        }
+        mViewModel = ViewModelProviders.of(this).get(ChatRoomListViewModel.class);
+        // TODO: Use the ViewModel
     }
 }
