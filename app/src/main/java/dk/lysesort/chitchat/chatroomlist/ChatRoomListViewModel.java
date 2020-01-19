@@ -16,4 +16,6 @@ public class ChatRoomListViewModel extends ViewModel {
     public void refreshChatRooms() {
         repository.fetchChatRooms();
     }
+
+
 }

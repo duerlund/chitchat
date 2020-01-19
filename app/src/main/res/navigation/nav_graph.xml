@@ -26,6 +26,8 @@
     <action
         android:id="@+id/action_chatRoomListFragment_to_chatRoomFragment"
         app:destination="@id/chatRoomFragment"
+        app:enterAnim="@anim/fui_slide_in_right"
+        app:exitAnim="@anim/fui_slide_out_left"
         app:popUpTo="@+id/chatRoomListFragment"
         />
   </fragment>
