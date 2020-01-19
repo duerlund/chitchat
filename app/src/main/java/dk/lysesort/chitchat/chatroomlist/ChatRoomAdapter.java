@@ -1,6 +1,8 @@
 package dk.lysesort.chitchat.chatroomlist;
 
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -14,18 +16,10 @@ import dk.lysesort.chitchat.R;
 public class ChatRoomAdapter extends RecyclerView.Adapter<ChatRoomAdapter.ChatRoomViewHolder> {
     private List<ChatRoom> data;
 
-    public static class ChatRoomViewHolder extends RecyclerView.ViewHolder {
-        public TextView name;
-        public TextView description;
+    private OnChatRoomClickListener onChatRoomClickListener;
 
-        public ChatRoomViewHolder(LinearLayout v) {
-            super(v);
-            name = v.findViewById(R.id.text_view_name);
-            description = v.findViewById(R.id.text_view_description);
-        }
-    }
-
-    public ChatRoomAdapter() {
+    public ChatRoomAdapter(OnChatRoomClickListener onChatRoomClickListener) {
+        this.onChatRoomClickListener = onChatRoomClickListener;
         this.data = new ArrayList<>();
     }
 
@@ -40,7 +34,7 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<ChatRoomAdapter.ChatRo
         LinearLayout view = (LinearLayout) LayoutInflater.from(parent.getContext())
             .inflate(R.layout.chat_room_list_item, parent, false);
 
-        ChatRoomViewHolder vh = new ChatRoomViewHolder(view);
+        ChatRoomViewHolder vh = new ChatRoomViewHolder(view, onChatRoomClickListener);
         return vh;
     }
 
@@ -53,6 +47,31 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<ChatRoomAdapter.ChatRo
     @Override
     public int getItemCount() {
         return data.size();
+    }
+
+    public interface OnChatRoomClickListener {
+        void onClick(int position);
+    }
+
+    public static class ChatRoomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private static final String TAG = "ChatRoom";
+        public TextView name;
+        public TextView description;
+        OnChatRoomClickListener listener;
+
+        public ChatRoomViewHolder(LinearLayout v, OnChatRoomClickListener listener) {
+            super(v);
+            this.listener = listener;
+            name = v.findViewById(R.id.text_view_name);
+            description = v.findViewById(R.id.text_view_description);
+            v.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            Log.d(TAG, "onclick");
+            listener.onClick(getAdapterPosition());
+        }
     }
 }
 
