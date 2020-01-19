@@ -42,8 +42,11 @@ public class ChatRoomListFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         adapter = new ChatRoomAdapter(position -> {
             ChatRoom room = viewModel.getChatRooms().getValue().get(position);
-            Navigation.findNavController(getView()).navigate(R.id.action_chatRoomListFragment_to_chatRoomFragment);
-            Toast.makeText(getActivity(), "Welcome to " + room.getName(), Toast.LENGTH_SHORT).show();
+            ChatRoomListFragmentDirections.ActionChatRoomListFragmentToChatRoomFragment action = ChatRoomListFragmentDirections
+                .actionChatRoomListFragmentToChatRoomFragment(room.getName());
+
+            Navigation.findNavController(getView()).navigate(action);
+
         });
         recyclerView.setAdapter(adapter);
 
