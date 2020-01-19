@@ -1,22 +1,28 @@
 package dk.lysesort.chitchat.chatroomlist;
 
-import androidx.lifecycle.ViewModelProviders;
-
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import dk.lysesort.chitchat.R;
-import dk.lysesort.chitchat.login.LoginViewModel;
 
 public class ChatRoomListFragment extends Fragment {
+    private static final String TAG = "ROOM";
+    private RecyclerView recyclerView;
+    private SwipeRefreshLayout swipeContainer;
 
+    private ChatRoomAdapter adapter;
     private ChatRoomListViewModel viewModel;
 
     public static ChatRoomListFragment newInstance() {
@@ -26,14 +32,29 @@ public class ChatRoomListFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
         @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.chat_room_list_fragment, container, false);
+        View view = inflater.inflate(R.layout.chat_room_list_fragment, container, false);
+
+
+        recyclerView = view.findViewById(R.id.recycler_view);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(layoutManager);
+
+        swipeContainer = view.findViewById(R.id.swipe_container);
+        swipeContainer.setOnRefreshListener(() -> viewModel.refreshChatRooms());
+
+        return view;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        adapter = new ChatRoomAdapter();
+        recyclerView.setAdapter(adapter);
+
         viewModel = ViewModelProviders.of(this).get(ChatRoomListViewModel.class);
-        LoginViewModel l = new LoginViewModel();
-        l.onSignOut(getContext());
+        viewModel.getChatRooms().observe(this, chatRooms -> {
+            adapter.setData(chatRooms);
+            swipeContainer.setRefreshing(false);
+        });
     }
 }
