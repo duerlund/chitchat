@@ -29,15 +29,16 @@ public class ChatRoomRepository {
             .get()
             .addOnCompleteListener(task -> {
                 List<ChatRoom> chatRooms = new ArrayList<>();
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        ChatRoom chatRoom = document.toObject(ChatRoom.class);
-                        chatRooms.add(chatRoom);
-                    }
-                    this.chatRooms.postValue(chatRooms);
-                } else {
-                    Log.e(TAG, "Error getting chatrooms", task.getException());
+                if (!task.isSuccessful()) {
+                    Log.e(TAG, "Error getting chat rooms", task.getException());
+                    return;
                 }
+
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    ChatRoom chatRoom = document.toObject(ChatRoom.class);
+                    chatRooms.add(chatRoom);
+                }
+                this.chatRooms.postValue(chatRooms);
             });
     }
 
