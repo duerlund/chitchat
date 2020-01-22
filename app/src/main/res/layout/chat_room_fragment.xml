@@ -7,6 +7,24 @@
     android:layout_height="match_parent"
     tools:context=".chatroom.ChatRoomFragment">
 
+  <androidx.recyclerview.widget.RecyclerView
+      android:id="@+id/recycler_view"
+      android:layout_width="0dp"
+      android:layout_height="0dp"
+      app:layout_constraintBottom_toTopOf="@+id/editText"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
+
+  <Button
+      android:id="@+id/upload_button"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Button"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toStartOf="@+id/editText"
+      app:layout_constraintStart_toStartOf="parent" />
+
   <EditText
       android:id="@+id/editText"
       android:layout_width="0dp"
@@ -15,8 +33,7 @@
       android:hint="Type a message"
       android:inputType="textPersonName"
       app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toStartOf="@+id/button"
-      app:layout_constraintStart_toStartOf="parent" />
+      app:layout_constraintEnd_toStartOf="@+id/button" />
 
   <Button
       android:id="@+id/button"
@@ -26,12 +43,4 @@
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toEndOf="parent" />
 
-  <androidx.recyclerview.widget.RecyclerView
-      android:id="@+id/recycler_view"
-      android:layout_width="0dp"
-      android:layout_height="0dp"
-      app:layout_constraintBottom_toTopOf="@+id/editText"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
