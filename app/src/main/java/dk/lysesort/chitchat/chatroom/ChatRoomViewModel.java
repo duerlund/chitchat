@@ -13,15 +13,25 @@ public class ChatRoomViewModel extends ViewModel {
         repository = new ChatMessageRepository("DZ0euDebpMaeEhK7gsGl");
     }
 
-    public LiveData<ChatMessage> getMessages() {
+    public LiveData<List<ChatMessage>> getMessages() {
         return repository.getMessages();
     }
 
-    public void getNewMessages() {
-        repository.getNewMessages();
+    public void listenForNewMessages() {
+        repository.listenForNewMessages();
     }
 
+    public void onScrollToEnd() {
+        repository.fetchOlderMessages();
+    }
 
+    public LiveData<List<ChatMessage>> getNewMessages() {
+        return repository.getNewMessages();
+    }
+
+    public LiveData<List<ChatMessage>> getOldMessages() {
+        return repository.getOldMessages();
+    }
 
     public void sendMessage(String user, String message) {
         repository.sendMessage(user, message);

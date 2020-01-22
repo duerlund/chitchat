@@ -27,9 +27,14 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         notifyDataSetChanged();
     }
 
-    public void addMessage(ChatMessage chatMessage) {
-        Log.d(TAG, "Adding message: " + chatMessage);
-        data.add(chatMessage);
+    public void newMessages(List<ChatMessage> newData) {
+        data.addAll(0, newData);
+        // notify ranges
+        notifyDataSetChanged();
+    }
+
+    public void addMessages(List<ChatMessage> newData) {
+        data.addAll(newData);
         notifyDataSetChanged();
     }
 
@@ -43,8 +48,9 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.user.setText(data.get(position).getUser());
-        holder.message.setText(data.get(position).getText());
+        ChatMessage message = data.get(position);
+        holder.user.setText(message.getTimestamp().toDate() + ": " + message.getUser());
+        holder.message.setText(message.getText());
     }
 
     @Override
