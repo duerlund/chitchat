@@ -9,6 +9,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -119,6 +120,29 @@ public class ChatMessageRepository {
             .add(chatMessage)
             .addOnSuccessListener(documentReference -> {
                 Log.d(TAG, "Sending message " + user + " -> " + message);
+            })
+            .addOnFailureListener(exception -> {
+                Log.e(TAG, "Failed to send message", exception);
+            });
+    }
+
+    public void sendMessage(String user, StorageReference imageReference) {
+        Map<String, Object> chatMessage = new HashMap<>();
+        chatMessage.put("user", user);
+
+        imageReference.getDownloadUrl().addOnSuccessListener(uri -> {
+            chatMessage.put("imageUrl", uri.toString());
+            chatMessage.put("imageReference", imageReference.toString());
+            chatMessage.put("timestamp", Timestamp.now());
+            sendChatMessage(chatMessage);
+        });
+    }
+
+    private void sendChatMessage(Map<String, Object> chatMessage) {
+        db.collection("rooms/" + chatRoomId + "/messages")
+            .add(chatMessage)
+            .addOnSuccessListener(documentReference -> {
+//                Log.d(TAG, "Sending message " + user + " -> " + message);
             })
             .addOnFailureListener(exception -> {
                 Log.e(TAG, "Failed to send message", exception);

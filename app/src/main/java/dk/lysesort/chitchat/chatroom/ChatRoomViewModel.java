@@ -1,20 +1,29 @@
 package dk.lysesort.chitchat.chatroom;
 
-import java.util.List;
+import com.google.firebase.storage.StorageReference;
 
-import androidx.lifecycle.LiveData;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModel;
 
 public class ChatRoomViewModel extends ViewModel {
     public static final String TAG = "Message";
     private ChatMessageRepository repository;
+    private ChatMessageAdapter adapter;
 
     public ChatRoomViewModel() {
         repository = new ChatMessageRepository("DZ0euDebpMaeEhK7gsGl");
+        adapter = new ChatMessageAdapter(repository);
     }
 
-    public LiveData<List<ChatMessage>> getMessages() {
-        return repository.getMessages();
+    public void listenForUpdates(LifecycleOwner lifecycleOwner) {
+        repository.getMessages()
+            .observe(lifecycleOwner, chatMessages -> {
+                adapter.addMessages(chatMessages);
+                listenForNewMessages();
+            });
+
+        repository.getNewMessages().observe(lifecycleOwner, adapter::newMessages);
+        repository.getOldMessages().observe(lifecycleOwner, adapter::addMessages);
     }
 
     public void listenForNewMessages() {
@@ -25,15 +34,16 @@ public class ChatRoomViewModel extends ViewModel {
         repository.fetchOlderMessages();
     }
 
-    public LiveData<List<ChatMessage>> getNewMessages() {
-        return repository.getNewMessages();
-    }
-
-    public LiveData<List<ChatMessage>> getOldMessages() {
-        return repository.getOldMessages();
-    }
-
     public void sendMessage(String user, String message) {
         repository.sendMessage(user, message);
+    }
+
+    public void sendMessage(String user, StorageReference storageReference) {
+        repository.sendMessage(user, storageReference);
+    }
+
+
+    public ChatMessageAdapter getAdapter() {
+        return adapter;
     }
 }

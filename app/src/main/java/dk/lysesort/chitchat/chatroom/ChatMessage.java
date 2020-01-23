@@ -7,6 +7,7 @@ public class ChatMessage {
     private Timestamp timestamp;
     private String user;
     private String text;
+    private String imageUrl;
 
     public ChatMessage() {
 
@@ -44,6 +45,14 @@ public class ChatMessage {
         this.text = text;
     }
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
     @Override
     public String toString() {
         return "ChatMessage{" +
@@ -51,6 +60,7 @@ public class ChatMessage {
                ", timestamp=" + timestamp +
                ", user='" + user + '\'' +
                ", text='" + text + '\'' +
+               ", imageUrl='" + imageUrl + '\'' +
                '}';
     }
 }
