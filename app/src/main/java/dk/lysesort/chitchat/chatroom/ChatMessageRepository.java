@@ -3,6 +3,8 @@ package dk.lysesort.chitchat.chatroom;
 import android.util.Log;
 
 import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -83,6 +85,26 @@ public class ChatMessageRepository {
             listenerRegistration.remove();
         }
 
+        if (newestMessage == null) {
+            listenerRegistration = messageCollection
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .addSnapshotListener((queryDocumentSnapshots, e) -> {
+                    Log.d(TAG, "onEvent");
+                    List<ChatMessage> messages = new ArrayList<>();
+                    for (QueryDocumentSnapshot result : queryDocumentSnapshots) {
+                        ChatMessage message = result.toObject(ChatMessage.class);
+                        Log.d(TAG, "new:" + message);
+                        messages.add(result.toObject(ChatMessage.class));
+                    }
+                    newMessages.postValue(messages);
+
+                    if (!queryDocumentSnapshots.getDocuments().isEmpty()) {
+                        update(queryDocumentSnapshots.getDocuments().get(0));
+                    }
+                });
+            return;
+        }
+
         listenerRegistration = messageCollection
             .orderBy("timestamp", Query.Direction.DESCENDING)
             .endBefore(newestMessage)
@@ -111,8 +133,12 @@ public class ChatMessageRepository {
     }
 
     public void sendMessage(String user, String message) {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        String profileImageUrl = currentUser.getPhotoUrl().toString();
+
         Map<String, Object> chatMessage = new HashMap<>();
-        chatMessage.put("user", user);
+        chatMessage.put("user", currentUser.getDisplayName());
+        chatMessage.put("profileImageUrl", profileImageUrl);
         chatMessage.put("text", message);
         chatMessage.put("timestamp", Timestamp.now());
 
@@ -127,13 +153,17 @@ public class ChatMessageRepository {
     }
 
     public void sendMessage(String user, StorageReference imageReference) {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        String profileImageUrl = currentUser.getPhotoUrl().toString();
+
         Map<String, Object> chatMessage = new HashMap<>();
-        chatMessage.put("user", user);
+        chatMessage.put("user", currentUser.getDisplayName());
+        chatMessage.put("profileImageUrl", profileImageUrl);
+        chatMessage.put("timestamp", Timestamp.now());
 
         imageReference.getDownloadUrl().addOnSuccessListener(uri -> {
-            chatMessage.put("imageUrl", uri.toString());
             chatMessage.put("imageReference", imageReference.toString());
-            chatMessage.put("timestamp", Timestamp.now());
+            chatMessage.put("imageUrl", uri.toString());
             sendChatMessage(chatMessage);
         });
     }

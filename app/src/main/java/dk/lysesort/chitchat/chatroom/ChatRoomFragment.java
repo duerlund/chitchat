@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -162,6 +163,8 @@ public class ChatRoomFragment extends Fragment {
             .addOnFailureListener(e -> Log.e("UPLOAD", "Failed to upload image", e))
             .addOnSuccessListener(
                 taskSnapshot -> {
+                    FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl();
+
                     viewModel.sendMessage("MR X", imageReference);
                     Toast.makeText(getContext(), "Upload successful", Toast.LENGTH_SHORT).show();
                 });
@@ -172,9 +175,5 @@ public class ChatRoomFragment extends Fragment {
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
-    }
-
-    private void sendImage(String user, Uri file) {
-
     }
 }

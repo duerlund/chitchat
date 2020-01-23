@@ -39,6 +39,8 @@ public class ChatRoomViewModel extends ViewModel {
     }
 
     public void sendMessage(String user, StorageReference storageReference) {
+
+
         repository.sendMessage(user, storageReference);
     }
 

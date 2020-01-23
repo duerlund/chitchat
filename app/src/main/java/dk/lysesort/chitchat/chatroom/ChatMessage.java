@@ -7,6 +7,7 @@ public class ChatMessage {
     private Timestamp timestamp;
     private String user;
     private String text;
+    private String profileImageUrl;
     private String imageUrl;
 
     public ChatMessage() {
@@ -45,6 +46,14 @@ public class ChatMessage {
         this.text = text;
     }
 
+    public String getProfileImageUrl() {
+        return profileImageUrl;
+    }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
+
     public String getImageUrl() {
         return imageUrl;
     }
@@ -60,6 +69,7 @@ public class ChatMessage {
                ", timestamp=" + timestamp +
                ", user='" + user + '\'' +
                ", text='" + text + '\'' +
+               ", profileImageUrl='" + profileImageUrl + '\'' +
                ", imageUrl='" + imageUrl + '\'' +
                '}';
     }

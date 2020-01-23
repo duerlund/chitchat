@@ -5,6 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+  <ImageView
+      android:id="@+id/profile_image"
+      android:layout_width="45dp"
+      android:layout_height="45dp"
+      android:scaleType="fitCenter"
+      tools:src="@mipmap/ic_launcher_round"
+    />
+
   <TextView
       android:id="@+id/username"
       android:layout_height="wrap_content"
@@ -17,6 +25,7 @@
       android:id="@+id/message"
       android:layout_height="wrap_content"
       android:layout_width="match_parent"
+      android:textSize="14sp"
       tools:text="Hello world" />
 
 </LinearLayout>
