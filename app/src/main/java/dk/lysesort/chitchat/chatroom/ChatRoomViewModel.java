@@ -34,16 +34,13 @@ public class ChatRoomViewModel extends ViewModel {
         repository.fetchOlderMessages();
     }
 
-    public void sendMessage(String user, String message) {
-        repository.sendMessage(user, message);
+    public void sendMessage(String message) {
+        repository.sendMessage(message);
     }
 
-    public void sendMessage(String user, StorageReference storageReference) {
-
-
-        repository.sendMessage(user, storageReference);
+    public void sendMessage(StorageReference storageReference) {
+        repository.sendMessage(storageReference);
     }
-
 
     public ChatMessageAdapter getAdapter() {
         return adapter;

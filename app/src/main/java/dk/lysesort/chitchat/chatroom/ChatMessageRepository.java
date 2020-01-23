@@ -132,7 +132,7 @@ public class ChatMessageRepository {
         return newMessages;
     }
 
-    public void sendMessage(String user, String message) {
+    public void sendMessage(String message) {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         String profileImageUrl = currentUser.getPhotoUrl().toString();
 
@@ -145,14 +145,14 @@ public class ChatMessageRepository {
         db.collection("rooms/" + chatRoomId + "/messages")
             .add(chatMessage)
             .addOnSuccessListener(documentReference -> {
-                Log.d(TAG, "Sending message " + user + " -> " + message);
+//                Log.d(TAG, "Sending message " + user + " -> " + message);
             })
             .addOnFailureListener(exception -> {
                 Log.e(TAG, "Failed to send message", exception);
             });
     }
 
-    public void sendMessage(String user, StorageReference imageReference) {
+    public void sendMessage(StorageReference imageReference) {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         String profileImageUrl = currentUser.getPhotoUrl().toString();
 

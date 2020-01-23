@@ -10,14 +10,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.webkit.MimeTypeMap;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -80,16 +77,18 @@ public class ChatRoomFragment extends Fragment {
 
         EditText editText = view.findViewById(R.id.editText);
 
-        Button button = view.findViewById(R.id.button);
-        button.setOnClickListener(v -> {
+        ImageView send = view.findViewById(R.id.button);
+        send.setOnClickListener(v -> {
             String message = editText.getText().toString();
-            viewModel.sendMessage("Mr. X", message);
+            viewModel.sendMessage(message);
             editText.setText("");
         });
 
-        Button imageButton = view.findViewById(R.id.upload_button);
-        imageButton.setOnClickListener(v -> openCamera());
-//        imageButton.setOnClickListener(v -> chooseImage());
+        ImageView cameraButton = view.findViewById(R.id.camera_button);
+        cameraButton.setOnClickListener(v -> openCamera());
+
+        ImageView imageButton = view.findViewById(R.id.upload_button);
+        imageButton.setOnClickListener(v -> chooseImage());
 
         return view;
     }
@@ -145,9 +144,16 @@ public class ChatRoomFragment extends Fragment {
         startActivityForResult(intent, OPEN_CAMERA_REQUEST);
     }
 
+    private void chooseImage() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+    }
+
     private File createImageFile() throws IOException {
         UUID uuid = UUID.randomUUID();
-        String imageFileName = "IMG_" + uuid;
+        String imageFileName = "IMG" + uuid;
         File storageDir = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(imageFileName, ".jpg", storageDir);
         currentImagePath = image.getAbsolutePath();
@@ -157,23 +163,17 @@ public class ChatRoomFragment extends Fragment {
     private void uploadImage(Uri file) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageReference = storage.getReference();
+
+        String suffix = MimeTypeMap.getFileExtensionFromUrl(file.toString());
         StorageReference imageReference = storageReference.child(
-            "images/" + file.getLastPathSegment());
+            "images/" + "IMG" + UUID.randomUUID() + "." + (suffix.isEmpty() ? "jpg" : suffix));
+
         imageReference.putFile(file)
             .addOnFailureListener(e -> Log.e("UPLOAD", "Failed to upload image", e))
             .addOnSuccessListener(
                 taskSnapshot -> {
-                    FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl();
-
-                    viewModel.sendMessage("MR X", imageReference);
+                    viewModel.sendMessage(imageReference);
                     Toast.makeText(getContext(), "Upload successful", Toast.LENGTH_SHORT).show();
                 });
-    }
-
-    private void chooseImage() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
     }
 }

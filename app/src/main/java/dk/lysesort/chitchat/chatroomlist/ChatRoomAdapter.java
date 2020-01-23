@@ -10,6 +10,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import dk.lysesort.chitchat.R;
 
@@ -31,7 +32,7 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<ChatRoomAdapter.ChatRo
     @Override
     public ChatRoomViewHolder onCreateViewHolder(ViewGroup parent,
         int viewType) {
-        LinearLayout view = (LinearLayout) LayoutInflater.from(parent.getContext())
+        ConstraintLayout view = (ConstraintLayout) LayoutInflater.from(parent.getContext())
             .inflate(R.layout.chat_room_list_item, parent, false);
 
         ChatRoomViewHolder vh = new ChatRoomViewHolder(view, onChatRoomClickListener);
@@ -59,7 +60,7 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<ChatRoomAdapter.ChatRo
         public TextView description;
         OnChatRoomClickListener listener;
 
-        public ChatRoomViewHolder(LinearLayout v, OnChatRoomClickListener listener) {
+        public ChatRoomViewHolder(ConstraintLayout v, OnChatRoomClickListener listener) {
             super(v);
             this.listener = listener;
             name = v.findViewById(R.id.text_view_name);
