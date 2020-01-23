@@ -1,5 +1,6 @@
 package dk.lysesort.chitchat.chatroom;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,6 +13,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,10 +39,29 @@ public class ChatRoomFragment extends Fragment {
     private String chatRoomId;
     private ChatRoomViewModel viewModel;
     private RecyclerView recyclerView;
+    private String currentImagePath;
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != Activity.RESULT_OK) {
+            return;
+        }
+
+        switch (requestCode) {
+            case OPEN_CAMERA_REQUEST:
+                File file = new File(currentImagePath);
+                Uri uri = Uri.fromFile(file);
+                uploadImage(uri);
+                break;
+            case PICK_IMAGE_REQUEST:
+                if (data == null) {
+                    return;
+                }
+                Uri uri2 = data.getData();
+                uploadImage(uri2);
+                break;
+        }
     }
 
     @Override
@@ -62,6 +88,7 @@ public class ChatRoomFragment extends Fragment {
 
         Button imageButton = view.findViewById(R.id.upload_button);
         imageButton.setOnClickListener(v -> openCamera());
+//        imageButton.setOnClickListener(v -> chooseImage());
 
         return view;
     }
@@ -71,9 +98,7 @@ public class ChatRoomFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         viewModel = ViewModelProviders.of(this).get(ChatRoomViewModel.class);
 
-        ChatMessageAdapter adapter = new ChatMessageAdapter();
-        recyclerView.setAdapter(adapter);
-
+        recyclerView.setAdapter(viewModel.getAdapter());
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
@@ -86,15 +111,7 @@ public class ChatRoomFragment extends Fragment {
             }
         });
 
-        viewModel.getMessages()
-            .observe(this, chatMessages -> {
-                adapter.addMessages(chatMessages);
-                viewModel.listenForNewMessages();
-            });
-
-        viewModel.getNewMessages().observe(this, adapter::newMessages);
-        viewModel.getOldMessages().observe(this, adapter::addMessages);
-
+        viewModel.listenForUpdates(this);
         Toast.makeText(getActivity(), "Welcome to " + chatRoomId, Toast.LENGTH_SHORT)
             .show();
     }
@@ -132,7 +149,22 @@ public class ChatRoomFragment extends Fragment {
         String imageFileName = "IMG_" + uuid;
         File storageDir = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(imageFileName, ".jpg", storageDir);
+        currentImagePath = image.getAbsolutePath();
         return image;
+    }
+
+    private void uploadImage(Uri file) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageReference = storage.getReference();
+        StorageReference imageReference = storageReference.child(
+            "images/" + file.getLastPathSegment());
+        imageReference.putFile(file)
+            .addOnFailureListener(e -> Log.e("UPLOAD", "Failed to upload image", e))
+            .addOnSuccessListener(
+                taskSnapshot -> {
+                    viewModel.sendMessage("MR X", imageReference);
+                    Toast.makeText(getContext(), "Upload successful", Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void chooseImage() {
@@ -140,5 +172,9 @@ public class ChatRoomFragment extends Fragment {
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+    }
+
+    private void sendImage(String user, Uri file) {
+
     }
 }
