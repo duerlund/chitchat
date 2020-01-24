@@ -96,7 +96,14 @@ public class ChatRoomFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        viewModel = ViewModelProviders.of(this).get(ChatRoomViewModel.class);
+
+        // "DZ0euDebpMaeEhK7gsGl"
+        viewModel = ViewModelProviders.of(
+            this,
+            new ChatRoomViewModelFactory(chatRoomId))
+            .get(ChatRoomViewModel.class);
+
+
 
         recyclerView.setAdapter(viewModel.getAdapter());
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
