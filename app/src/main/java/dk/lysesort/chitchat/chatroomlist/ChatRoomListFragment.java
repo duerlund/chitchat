@@ -27,6 +27,8 @@ public class ChatRoomListFragment extends Fragment {
         @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.chat_room_list_fragment, container, false);
 
+
+
         recyclerView = view.findViewById(R.id.recycler_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
@@ -40,6 +42,22 @@ public class ChatRoomListFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        try {
+            String chatRoomId = getActivity().getIntent().getStringExtra("chatRoomId");
+            getActivity().getIntent().removeExtra("chatRoomId");
+
+            if (chatRoomId != null) {
+                Toast.makeText(getActivity(), "Go to " + chatRoomId, Toast.LENGTH_LONG).show();
+                ChatRoomListFragmentDirections.ActionChatRoomListFragmentToChatRoomFragment action = ChatRoomListFragmentDirections
+                    .actionChatRoomListFragmentToChatRoomFragment(chatRoomId);
+
+                Navigation.findNavController(getView()).navigate(action);
+            }
+        } catch (NullPointerException e) {
+            // ignore
+        }
+
+
         adapter = new ChatRoomAdapter(position -> {
             ChatRoom room = viewModel.getChatRooms().getValue().get(position);
             ChatRoomListFragmentDirections.ActionChatRoomListFragmentToChatRoomFragment action = ChatRoomListFragmentDirections
