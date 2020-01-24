@@ -6,11 +6,13 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
@@ -31,6 +33,7 @@ public class ChatMessageRepository {
     private String chatRoomId;
 
     private CollectionReference messageCollection;
+    private DocumentReference chatRoomReference;
     private ListenerRegistration listenerRegistration;
     private DocumentSnapshot newestMessage;
     private DocumentSnapshot oldestMessage;
@@ -43,6 +46,7 @@ public class ChatMessageRepository {
 
         this.chatRoomId = chatRoomId;
         messageCollection = db.collection("rooms/" + chatRoomId + "/messages");
+        chatRoomReference = db.document("rooms/" + chatRoomId);
         fetchInitial();
     }
 
@@ -140,16 +144,28 @@ public class ChatMessageRepository {
         chatMessage.put("user", currentUser.getDisplayName());
         chatMessage.put("profileImageUrl", profileImageUrl);
         chatMessage.put("text", message);
-        chatMessage.put("timestamp", Timestamp.now());
 
-        db.collection("rooms/" + chatRoomId + "/messages")
+        sendChatMessage(chatMessage);
+    }
+
+    private void sendChatMessage(Map<String, Object> chatMessage) {
+
+        Timestamp now = Timestamp.now();
+        chatMessage.put("timestamp", now);
+
+        messageCollection
             .add(chatMessage)
             .addOnSuccessListener(documentReference -> {
-//                Log.d(TAG, "Sending message " + user + " -> " + message);
+                updateTimestamp(now);
             })
-            .addOnFailureListener(exception -> {
-                Log.e(TAG, "Failed to send message", exception);
-            });
+            .addOnFailureListener(exception -> Log.e(TAG, "Failed to send message", exception));
+    }
+
+    private void updateTimestamp(Timestamp timeStamp) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("timestamp", timeStamp);
+        chatRoomReference.set(data, SetOptions.merge())
+            .addOnFailureListener(exception -> Log.e(TAG, "Failed to update timestamp", exception));
     }
 
     public void sendMessage(StorageReference imageReference) {
@@ -159,24 +175,12 @@ public class ChatMessageRepository {
         Map<String, Object> chatMessage = new HashMap<>();
         chatMessage.put("user", currentUser.getDisplayName());
         chatMessage.put("profileImageUrl", profileImageUrl);
-        chatMessage.put("timestamp", Timestamp.now());
 
         imageReference.getDownloadUrl().addOnSuccessListener(uri -> {
             chatMessage.put("imageReference", imageReference.toString());
             chatMessage.put("imageUrl", uri.toString());
             sendChatMessage(chatMessage);
         });
-    }
-
-    private void sendChatMessage(Map<String, Object> chatMessage) {
-        db.collection("rooms/" + chatRoomId + "/messages")
-            .add(chatMessage)
-            .addOnSuccessListener(documentReference -> {
-//                Log.d(TAG, "Sending message " + user + " -> " + message);
-            })
-            .addOnFailureListener(exception -> {
-                Log.e(TAG, "Failed to send message", exception);
-            });
     }
 
     public void fetchOlderMessages() {
