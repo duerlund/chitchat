@@ -1,6 +1,7 @@
 package dk.lysesort.chitchat.chatroom;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -97,13 +99,10 @@ public class ChatRoomFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        // "DZ0euDebpMaeEhK7gsGl"
         viewModel = ViewModelProviders.of(
             this,
             new ChatRoomViewModelFactory(chatRoomId))
             .get(ChatRoomViewModel.class);
-
-
 
         recyclerView.setAdapter(viewModel.getAdapter());
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -119,8 +118,44 @@ public class ChatRoomFragment extends Fragment {
         });
 
         viewModel.listenForUpdates(this);
-        Toast.makeText(getActivity(), "Welcome to " + chatRoomId, Toast.LENGTH_SHORT)
-            .show();
+    }
+
+    @Override
+    public void onResume() {
+
+        super.onResume();
+
+        if (!ChatRoomPreferenceRepository.hasAnswered(getContext(), chatRoomId)) {
+            new AlertDialog.Builder(getContext())
+                .setMessage("Would you like to receive push notifications for this chat room?")
+                .setPositiveButton(
+                    "Yes",
+                    (dialog, which) -> FirebaseMessaging.getInstance()
+                        .subscribeToTopic("chatroom." + chatRoomId)
+                        .addOnSuccessListener(
+                            aVoid ->
+                            {
+                                ChatRoomPreferenceRepository.subscribe(getContext(), chatRoomId);
+                                Toast.makeText(getActivity(),
+                                               "Subscribed to push",
+                                               Toast.LENGTH_SHORT).show();
+                            })
+
+                )
+                .setNegativeButton(
+                    "No", (dialog, which) -> FirebaseMessaging.getInstance()
+                        .unsubscribeFromTopic("chatroom." + chatRoomId)
+                        .addOnSuccessListener(
+                            aVoid ->
+                            {
+                                ChatRoomPreferenceRepository.unsubscribe(getContext(), chatRoomId);
+                                Toast.makeText(getActivity(),
+                                               "Unsubscribed",
+                                               Toast.LENGTH_SHORT).show();
+                            }))
+                .create()
+                .show();
+        }
     }
 
     private void openCamera() {
