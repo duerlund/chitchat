@@ -1,10 +1,12 @@
 package dk.lysesort.chitchat;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.iid.FirebaseInstanceId;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -13,6 +15,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         FirebaseApp.getInstance();
+
+        FirebaseInstanceId.getInstance()
+            .getInstanceId()
+            .addOnSuccessListener(instanceIdResult -> {
+                String token = instanceIdResult.getToken();
+                Log.d("FCM", "InstanceId: " + token);
+            });
 
         try {
             Thread.sleep(1000);
