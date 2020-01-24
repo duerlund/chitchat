@@ -21,19 +21,20 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:src="@drawable/baseline_photo_camera_black_36"
+      android:tint="@color/colorPrimaryDark"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toStartOf="@+id/upload_button"
-      app:layout_constraintStart_toStartOf="parent"
-    />
+      app:layout_constraintStart_toStartOf="parent" />
 
   <ImageView
       android:id="@+id/upload_button"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:src="@drawable/baseline_photo_black_36"
+      android:tint="@color/colorPrimaryDark"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toStartOf="@+id/editText"
-      app:layout_constraintStart_toStartOf="@id/camera_button" />
+      app:layout_constraintStart_toEndOf="@id/camera_button" />
 
   <EditText
       android:id="@+id/editText"
@@ -50,6 +51,7 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:src="@drawable/baseline_send_black_36"
+      android:tint="@color/colorPrimaryDark"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toEndOf="parent" />
 

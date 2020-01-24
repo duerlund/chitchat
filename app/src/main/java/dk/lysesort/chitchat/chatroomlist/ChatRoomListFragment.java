@@ -43,7 +43,7 @@ public class ChatRoomListFragment extends Fragment {
         adapter = new ChatRoomAdapter(position -> {
             ChatRoom room = viewModel.getChatRooms().getValue().get(position);
             ChatRoomListFragmentDirections.ActionChatRoomListFragmentToChatRoomFragment action = ChatRoomListFragmentDirections
-                .actionChatRoomListFragmentToChatRoomFragment(room.getName());
+                .actionChatRoomListFragmentToChatRoomFragment(room.getId());
 
             Navigation.findNavController(getView()).navigate(action);
 

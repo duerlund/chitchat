@@ -10,8 +10,8 @@ public class ChatRoomViewModel extends ViewModel {
     private ChatMessageRepository repository;
     private ChatMessageAdapter adapter;
 
-    public ChatRoomViewModel() {
-        repository = new ChatMessageRepository("DZ0euDebpMaeEhK7gsGl");
+    public ChatRoomViewModel(String chatRoomId) {
+        repository = new ChatMessageRepository(chatRoomId);
         adapter = new ChatMessageAdapter(repository);
     }
 

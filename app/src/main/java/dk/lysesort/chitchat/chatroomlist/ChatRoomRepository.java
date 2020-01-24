@@ -36,6 +36,7 @@ public class ChatRoomRepository {
 
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     ChatRoom chatRoom = document.toObject(ChatRoom.class);
+                    chatRoom.setId(document.getId());
                     chatRooms.add(chatRoom);
                 }
                 this.chatRooms.postValue(chatRooms);
