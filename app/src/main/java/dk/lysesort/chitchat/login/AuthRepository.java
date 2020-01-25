@@ -15,7 +15,6 @@ import java.util.List;
 import dk.lysesort.chitchat.R;
 
 public class AuthRepository {
-
     private static final String TAG = "Authorization";
 
     /**
@@ -30,18 +29,18 @@ public class AuthRepository {
         builder
             .setTitle(R.string.sign_out_dialog_title)
             .setMessage(R.string.sign_out_dialog_message)
+            .setNegativeButton(R.string.sign_out_dialog_button_negative, null)
             .setPositiveButton(
                 R.string.sign_out_dialog_button_positive,
-                (dialog, which) -> AuthUI.getInstance()
-                    .signOut(context)
-                    .addOnFailureListener(exception -> {
-                        Log.e(TAG, "Error signing out", exception);
-                        Toast.makeText(context,
-                                       "Failed to sign out",
-                                       Toast.LENGTH_SHORT)
-                            .show();
-                    }))
-            .setNegativeButton(R.string.sign_out_dialog_button_negative, null)
+                (dialog, which) ->
+                    AuthUI.getInstance()
+                        .signOut(context)
+                        .addOnFailureListener(exception -> {
+                            Log.e(TAG, "Error signing out", exception);
+                            Toast.makeText(context, R.string.sign_out_failed, Toast.LENGTH_SHORT)
+                                .show();
+                        }))
+
             .create()
             .show();
     }
