@@ -25,7 +25,7 @@ import androidx.lifecycle.MutableLiveData;
 
 public class ChatMessageRepository {
     private static final String TAG = "Message";
-    private static final int MESSAGES_TO_LOAD = 25;
+    private static final int MESSAGES_TO_LOAD = 50;
     private FirebaseFirestore db;
     private MutableLiveData<List<ChatMessage>> messages;
     private MutableLiveData<List<ChatMessage>> newMessages;
