@@ -13,7 +13,17 @@
 
   <string name="menu_item_sign_out">Sign out</string>
   <string name="menu_item_toggle_notifications">Toggle notifications</string>
+
+  <string name="notification_dialog_title">Push notifications?</string>
+  <string name="notification_dialog_message">Would you like to receive push notifications for this chat room?</string>
+  <string name="notification_dialog_button_positive">Yes</string>
+  <string name="notification_dialog_button_negative">No</string>
+  <string name="notification_toast_subscribed">Subscribed to push notifications</string>
+  <string name="notification_toast_unsubscribed">Unsubscribed</string>
+
   <string name="chat_room_button_open_camera">Open camera</string>
   <string name="chat_room_button_upload_from_gallery">Open gallery</string>
   <string name="chat_room_button_send_message">Send</string>
+
+  <string name="gallery_intent_title">Select a picture</string>
 </resources>

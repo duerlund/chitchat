@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
@@ -50,26 +51,33 @@ public class ChatRoomFragment extends AuthorizedFragment {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode != Activity.RESULT_OK) {
-            return;
-        }
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+        @Nullable Bundle savedInstanceState) {
+        chatRoomId = ChatRoomFragmentArgs.fromBundle(getArguments()).getChatRoomId();
 
-        switch (requestCode) {
-            case OPEN_CAMERA_REQUEST:
-                File file = new File(currentImagePath);
-                Uri uri = Uri.fromFile(file);
-                uploadImage(uri);
-                break;
-            case PICK_IMAGE_REQUEST:
-                if (data == null) {
-                    return;
-                }
-                Uri uri2 = data.getData();
-                uploadImage(uri2);
-                break;
-        }
+        View view = inflater.inflate(R.layout.chat_room_fragment, container, false);
+        recyclerView = view.findViewById(R.id.recycler_view);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        layoutManager.setSmoothScrollbarEnabled(true);
+
+        recyclerView.setLayoutManager(layoutManager);
+
+        EditText editText = view.findViewById(R.id.editText);
+
+        ImageView send = view.findViewById(R.id.button);
+        send.setOnClickListener(v -> {
+            String message = editText.getText().toString();
+            viewModel.sendMessage(message);
+            editText.setText("");
+        });
+
+        ImageView cameraButton = view.findViewById(R.id.camera_button);
+        cameraButton.setOnClickListener(v -> openCamera());
+
+        ImageView imageButton = view.findViewById(R.id.upload_button);
+        imageButton.setOnClickListener(v -> chooseImage());
+
+        return view;
     }
 
     @Override
@@ -98,94 +106,29 @@ public class ChatRoomFragment extends AuthorizedFragment {
     }
 
     @Override
-    public void onResume() {
-
-        super.onResume();
-
-        if (!ChatRoomPreferenceRepository.hasAnswered(getContext(), chatRoomId)) {
-            new AlertDialog.Builder(getContext())
-                .setMessage("Would you like to receive push notifications for this chat room?")
-                .setPositiveButton(
-                    "Yes",
-                    (dialog, which) -> FirebaseMessaging.getInstance()
-                        .subscribeToTopic("chatroom." + chatRoomId)
-                        .addOnSuccessListener(
-                            aVoid ->
-                            {
-                                ChatRoomPreferenceRepository.subscribe(getContext(), chatRoomId);
-                                Toast.makeText(getActivity(),
-                                               "Subscribed to push",
-                                               Toast.LENGTH_SHORT).show();
-                            })
-
-                )
-                .setNegativeButton(
-                    "No", (dialog, which) -> FirebaseMessaging.getInstance()
-                        .unsubscribeFromTopic("chatroom." + chatRoomId)
-                        .addOnSuccessListener(
-                            aVoid ->
-                            {
-                                ChatRoomPreferenceRepository.unsubscribe(getContext(), chatRoomId);
-                                Toast.makeText(getActivity(),
-                                               "Unsubscribed",
-                                               Toast.LENGTH_SHORT).show();
-                            }))
-                .create()
-                .show();
-        }
-    }
-
-    @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.chat_room, menu);
-    }
 
-    private void uploadImage(Uri file) {
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageReference = storage.getReference();
-
-        String suffix = MimeTypeMap.getFileExtensionFromUrl(file.toString());
-        StorageReference imageReference = storageReference.child(
-            "images/" + "IMG" + UUID.randomUUID() + "." + (suffix.isEmpty() ? "jpg" : suffix));
-
-        imageReference.putFile(file)
-            .addOnFailureListener(e -> Log.e("UPLOAD", "Failed to upload image", e))
-            .addOnSuccessListener(
-                taskSnapshot -> {
-                    viewModel.sendMessage(imageReference);
-                    Toast.makeText(getContext(), "Upload successful", Toast.LENGTH_SHORT).show();
-                });
+        boolean isSubscribed = ChatRoomPreferenceRepository
+            .isSubscribedToPush(getContext(), chatRoomId);
+        menu.findItem(R.id.action_toggle_notifications)
+            .setIcon(isSubscribed ? R.drawable.baseline_notifications_active_24
+                                  : R.drawable.baseline_notifications_off_24);
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-        @Nullable Bundle savedInstanceState) {
-        chatRoomId = ChatRoomFragmentArgs.fromBundle(getArguments()).getChatRoomId();
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.action_toggle_notifications) {
 
-        View view = inflater.inflate(R.layout.chat_room_fragment, container, false);
-        recyclerView = view.findViewById(R.id.recycler_view);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        layoutManager.setSmoothScrollbarEnabled(true);
+            boolean state = ChatRoomPreferenceRepository
+                .toggleSubscription(getContext(), chatRoomId);
 
-        recyclerView.setLayoutManager(layoutManager);
+            item.setIcon(state ? R.drawable.baseline_notifications_active_24
+                               : R.drawable.baseline_notifications_off_24);
+        }
 
-        EditText editText = view.findViewById(R.id.editText);
-
-        ImageView send = view.findViewById(R.id.button);
-        send.setOnClickListener(v -> {
-            String message = editText.getText().toString();
-            viewModel.sendMessage(message);
-            editText.setText("");
-        });
-
-        ImageView cameraButton = view.findViewById(R.id.camera_button);
-        cameraButton.setOnClickListener(v -> openCamera());
-
-        ImageView imageButton = view.findViewById(R.id.upload_button);
-        imageButton.setOnClickListener(v -> chooseImage());
-
-        return view;
+        return super.onOptionsItemSelected(item);
     }
 
     private void openCamera() {
@@ -220,7 +163,7 @@ public class ChatRoomFragment extends AuthorizedFragment {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+        startActivityForResult(Intent.createChooser(intent, getString(R.string.gallery_intent_title)), PICK_IMAGE_REQUEST);
     }
 
     private File createImageFile() throws IOException {
@@ -230,5 +173,81 @@ public class ChatRoomFragment extends AuthorizedFragment {
         File image = File.createTempFile(imageFileName, ".jpg", storageDir);
         currentImagePath = image.getAbsolutePath();
         return image;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != Activity.RESULT_OK) {
+            return;
+        }
+
+        switch (requestCode) {
+            case OPEN_CAMERA_REQUEST:
+                File file = new File(currentImagePath);
+                Uri uri = Uri.fromFile(file);
+                uploadImage(uri);
+                break;
+            case PICK_IMAGE_REQUEST:
+                if (data == null) {
+                    return;
+                }
+                Uri uri2 = data.getData();
+                uploadImage(uri2);
+                break;
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!ChatRoomPreferenceRepository.hasAnswered(getContext(), chatRoomId)) {
+            new AlertDialog.Builder(getContext())
+                .setMessage(R.string.notification_dialog_message)
+                .setPositiveButton(
+                    R.string.notification_dialog_button_positive,
+                    (dialog, which) -> FirebaseMessaging.getInstance()
+                        .subscribeToTopic("chatroom." + chatRoomId)
+                        .addOnSuccessListener(
+                            aVoid ->
+                            {
+                                ChatRoomPreferenceRepository.subscribe(getContext(), chatRoomId);
+                                Toast.makeText(getActivity(),
+                                               R.string.notification_toast_subscribed,
+                                               Toast.LENGTH_SHORT).show();
+                            })
+
+                )
+                .setNegativeButton(
+                    R.string.notification_dialog_button_negative, (dialog, which) -> FirebaseMessaging.getInstance()
+                        .unsubscribeFromTopic("chatroom." + chatRoomId)
+                        .addOnSuccessListener(
+                            aVoid ->
+                            {
+                                ChatRoomPreferenceRepository.unsubscribe(getContext(), chatRoomId);
+                                Toast.makeText(getActivity(),
+                                               R.string.notification_toast_unsubscribed,
+                                               Toast.LENGTH_SHORT).show();
+                            }))
+                .create()
+                .show();
+        }
+    }
+
+    private void uploadImage(Uri file) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageReference = storage.getReference();
+
+        String suffix = MimeTypeMap.getFileExtensionFromUrl(file.toString());
+        StorageReference imageReference = storageReference.child(
+            "images/" + "IMG" + UUID.randomUUID() + "." + (suffix.isEmpty() ? "jpg" : suffix));
+
+        imageReference.putFile(file)
+            .addOnFailureListener(e -> Log.e("UPLOAD", "Failed to upload image", e))
+            .addOnSuccessListener(
+                taskSnapshot -> {
+                    viewModel.sendMessage(imageReference);
+                    Toast.makeText(getContext(), "Upload successful", Toast.LENGTH_SHORT).show();
+                });
     }
 }
