@@ -1,7 +1,6 @@
 package dk.lysesort.chitchat.chatroom;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,7 +18,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -103,6 +101,8 @@ public class ChatRoomFragment extends AuthorizedFragment {
         });
 
         viewModel.listenForUpdates(this);
+
+
     }
 
     @Override
@@ -120,10 +120,7 @@ public class ChatRoomFragment extends AuthorizedFragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.action_toggle_notifications) {
-
-            boolean state = ChatRoomPreferenceRepository
-                .toggleSubscription(getContext(), chatRoomId);
-
+            boolean state = viewModel.onToggleNotifications(getContext());
             item.setIcon(state ? R.drawable.baseline_notifications_active_24
                                : R.drawable.baseline_notifications_off_24);
         }
@@ -201,37 +198,7 @@ public class ChatRoomFragment extends AuthorizedFragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (!ChatRoomPreferenceRepository.hasAnswered(getContext(), chatRoomId)) {
-            new AlertDialog.Builder(getContext())
-                .setMessage(R.string.notification_dialog_message)
-                .setPositiveButton(
-                    R.string.notification_dialog_button_positive,
-                    (dialog, which) -> FirebaseMessaging.getInstance()
-                        .subscribeToTopic("chatroom." + chatRoomId)
-                        .addOnSuccessListener(
-                            aVoid ->
-                            {
-                                ChatRoomPreferenceRepository.subscribe(getContext(), chatRoomId);
-                                Toast.makeText(getActivity(),
-                                               R.string.notification_toast_subscribed,
-                                               Toast.LENGTH_SHORT).show();
-                            })
-
-                )
-                .setNegativeButton(
-                    R.string.notification_dialog_button_negative, (dialog, which) -> FirebaseMessaging.getInstance()
-                        .unsubscribeFromTopic("chatroom." + chatRoomId)
-                        .addOnSuccessListener(
-                            aVoid ->
-                            {
-                                ChatRoomPreferenceRepository.unsubscribe(getContext(), chatRoomId);
-                                Toast.makeText(getActivity(),
-                                               R.string.notification_toast_unsubscribed,
-                                               Toast.LENGTH_SHORT).show();
-                            }))
-                .create()
-                .show();
-        }
+        viewModel.showPushNotificationDialog(getContext());
     }
 
     private void uploadImage(Uri file) {
