@@ -21,6 +21,22 @@ public class ChatRoomPreferenceRepository {
         return getSharedPreferences(context).getBoolean(chatRoomId, false);
     }
 
+    /**
+     * Toggle subscription state and return the new value.
+     * @param context context for loading shared preferences
+     * @param chatRoomId chat room id
+     * @return Toggled value
+     */
+    public static boolean toggleSubscription(Context context, String chatRoomId) {
+        boolean subscribed = isSubscribedToPush(context, chatRoomId);
+        getSharedPreferences(context)
+            .edit()
+            .putBoolean(chatRoomId, !subscribed)
+            .apply();
+
+        return !subscribed;
+    }
+
     public static void subscribe(Context context, String chatRoomId) {
         getSharedPreferences(context)
             .edit()
