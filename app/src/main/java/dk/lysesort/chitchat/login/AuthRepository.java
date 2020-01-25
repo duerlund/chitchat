@@ -1,5 +1,6 @@
 package dk.lysesort.chitchat.login;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -11,12 +12,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.Arrays;
 import java.util.List;
 
+import dk.lysesort.chitchat.R;
+
 public class AuthRepository {
 
     private static final String TAG = "Authorization";
 
     /**
-     *
      * @return
      */
     public boolean isSignedIn() {
@@ -24,12 +26,24 @@ public class AuthRepository {
     }
 
     public void signOut(Context context) {
-        AuthUI.getInstance()
-            .signOut(context)
-            .addOnFailureListener(exception -> {
-                Log.e(TAG, "Error signing out", exception);
-                Toast.makeText(context, "Failed to sign out", Toast.LENGTH_SHORT).show();
-            });
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder
+            .setTitle(R.string.sign_out_dialog_title)
+            .setMessage(R.string.sign_out_dialog_message)
+            .setPositiveButton(
+                R.string.sign_out_dialog_button_positive,
+                (dialog, which) -> AuthUI.getInstance()
+                    .signOut(context)
+                    .addOnFailureListener(exception -> {
+                        Log.e(TAG, "Error signing out", exception);
+                        Toast.makeText(context,
+                                       "Failed to sign out",
+                                       Toast.LENGTH_SHORT)
+                            .show();
+                    }))
+            .setNegativeButton(R.string.sign_out_dialog_button_negative, null)
+            .create()
+            .show();
     }
 
     /**
