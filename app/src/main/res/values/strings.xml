@@ -1,3 +1,10 @@
 <resources>
   <string name="app_name">Chit Chat</string>
+  <string name="chat_room_list_actionbar_title">Chat rooms</string>
+  <string name="chat_room_list_item_enter">Enter</string>
+
+  <string name="sign_out_dialog_title">Sign out?</string>
+  <string name="sign_out_dialog_message">"Do you want to sign out?"</string>
+  <string name="sign_out_dialog_button_positive">Yes</string>
+  <string name="sign_out_dialog_button_negative">No</string>
 </resources>
