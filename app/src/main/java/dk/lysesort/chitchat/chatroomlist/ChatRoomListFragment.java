@@ -4,19 +4,19 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import dk.lysesort.chitchat.R;
+import dk.lysesort.chitchat.login.AuthorizedFragment;
 
-public class ChatRoomListFragment extends Fragment {
+public class ChatRoomListFragment extends AuthorizedFragment {
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeContainer;
     private ChatRoomAdapter adapter;
@@ -45,11 +45,9 @@ public class ChatRoomListFragment extends Fragment {
             getActivity().getIntent().removeExtra("chatRoomId");
 
             if (chatRoomId != null) {
-                Toast.makeText(getActivity(), "Go to " + chatRoomId, Toast.LENGTH_LONG).show();
-                ChatRoomListFragmentDirections.ActionChatRoomListFragmentToChatRoomFragment action = ChatRoomListFragmentDirections
+                NavDirections directions = ChatRoomListFragmentDirections
                     .actionChatRoomListFragmentToChatRoomFragment(chatRoomId);
-
-                Navigation.findNavController(getView()).navigate(action);
+                Navigation.findNavController(getView()).navigate(directions);
             }
         } catch (NullPointerException e) {
             // ignore
@@ -57,10 +55,10 @@ public class ChatRoomListFragment extends Fragment {
 
         adapter = new ChatRoomAdapter(position -> {
             ChatRoom room = viewModel.getChatRooms().getValue().get(position);
-            ChatRoomListFragmentDirections.ActionChatRoomListFragmentToChatRoomFragment action = ChatRoomListFragmentDirections
+            NavDirections directions = ChatRoomListFragmentDirections
                 .actionChatRoomListFragmentToChatRoomFragment(room.getId());
 
-            Navigation.findNavController(getView()).navigate(action);
+            Navigation.findNavController(getView()).navigate(directions);
         });
         recyclerView.setAdapter(adapter);
 

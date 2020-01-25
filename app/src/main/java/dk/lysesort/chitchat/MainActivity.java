@@ -15,16 +15,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         FirebaseApp.getInstance();
-
-        FirebaseInstanceId.getInstance()
-            .getInstanceId()
+        FirebaseInstanceId.getInstance().getInstanceId()
             .addOnSuccessListener(instanceIdResult -> {
                 String token = instanceIdResult.getToken();
                 Log.d("FCM", "InstanceId: " + token);
             });
 
         try {
-            Thread.sleep(1000);
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
