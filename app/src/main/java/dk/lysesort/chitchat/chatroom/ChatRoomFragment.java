@@ -57,6 +57,8 @@ public class ChatRoomFragment extends AuthorizedFragment {
         recyclerView = view.findViewById(R.id.recycler_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         layoutManager.setSmoothScrollbarEnabled(true);
+        layoutManager.setReverseLayout(true);
+        layoutManager.setStackFromEnd(false);
 
         recyclerView.setLayoutManager(layoutManager);
 
@@ -88,17 +90,18 @@ public class ChatRoomFragment extends AuthorizedFragment {
             .get(ChatRoomViewModel.class);
 
         recyclerView.setAdapter(viewModel.getAdapter());
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                if (!recyclerView.canScrollVertically(1) &&
-                    newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    Log.d("SCROLL", "Reached the end");
-                    viewModel.onScrollToEnd();
-                }
-            }
-        });
+
+//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+//                super.onScrollStateChanged(recyclerView, newState);
+//                if (!recyclerView.canScrollVertically(1) &&
+//                    newState == RecyclerView.SCROLL_STATE_IDLE) {
+//                    Log.d("SCROLL", "Reached the end");
+//                    viewModel.onScrollToEnd();
+//                }
+//            }
+//        });
 
         viewModel.listenForUpdates(this);
 
