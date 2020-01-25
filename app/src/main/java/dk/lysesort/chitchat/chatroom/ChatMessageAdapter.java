@@ -1,5 +1,7 @@
 package dk.lysesort.chitchat.chatroom;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -87,11 +89,13 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
                 Glide.with(imageViewHolder.profileImage)
                     .load(message.getProfileImageUrl())
+                    .error(R.drawable.baseline_person_24)
                     .centerCrop()
                     .into(imageViewHolder.profileImage);
 
                 Glide.with(imageViewHolder.image)
                     .load(imageUrl)
+                    .error(R.drawable.baseline_broken_image_24)
                     .centerCrop()
                     .into(imageViewHolder.image);
                 break;
