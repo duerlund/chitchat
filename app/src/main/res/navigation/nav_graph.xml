@@ -3,20 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph.xml"
-    app:startDestination="@id/loginFragment"
+    app:startDestination="@id/chatRoomListFragment"
     >
-
-  <fragment
-      android:id="@+id/loginFragment"
-      android:name="dk.lysesort.chitchat.login.LoginFragment"
-      android:label="login_fragment"
-      tools:layout="@layout/login_fragment"
-      >
-    <action
-        android:id="@+id/action_loginFragment_to_chatRoomListFragment"
-        app:destination="@id/chatRoomListFragment"
-        />
-  </fragment>
   <fragment
       android:id="@+id/chatRoomListFragment"
       android:name="dk.lysesort.chitchat.chatroomlist.ChatRoomListFragment"

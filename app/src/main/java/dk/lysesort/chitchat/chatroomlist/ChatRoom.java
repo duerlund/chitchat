@@ -12,13 +12,6 @@ public class ChatRoom {
 
     }
 
-    public ChatRoom(String id, Timestamp timestamp, String name, String description) {
-        this.id = id;
-        this.timestamp = timestamp;
-        this.name = name;
-        this.description = description;
-    }
-
     public String getId() {
         return id;
     }

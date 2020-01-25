@@ -27,13 +27,13 @@ import java.util.UUID;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import dk.lysesort.chitchat.R;
+import dk.lysesort.chitchat.login.AuthorizedFragment;
 
-public class ChatRoomFragment extends Fragment {
+public class ChatRoomFragment extends AuthorizedFragment {
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int OPEN_CAMERA_REQUEST = 2;
     private String chatRoomId;
@@ -62,37 +62,6 @@ public class ChatRoomFragment extends Fragment {
                 uploadImage(uri2);
                 break;
         }
-    }
-
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-        @Nullable Bundle savedInstanceState) {
-        chatRoomId = ChatRoomFragmentArgs.fromBundle(getArguments()).getChatRoomId();
-
-        View view = inflater.inflate(R.layout.chat_room_fragment, container, false);
-        recyclerView = view.findViewById(R.id.recycler_view);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        layoutManager.setSmoothScrollbarEnabled(true);
-//        layoutManager.setReverseLayout(true);
-
-        recyclerView.setLayoutManager(layoutManager);
-
-        EditText editText = view.findViewById(R.id.editText);
-
-        ImageView send = view.findViewById(R.id.button);
-        send.setOnClickListener(v -> {
-            String message = editText.getText().toString();
-            viewModel.sendMessage(message);
-            editText.setText("");
-        });
-
-        ImageView cameraButton = view.findViewById(R.id.camera_button);
-        cameraButton.setOnClickListener(v -> openCamera());
-
-        ImageView imageButton = view.findViewById(R.id.upload_button);
-        imageButton.setOnClickListener(v -> chooseImage());
-
-        return view;
     }
 
     @Override
@@ -158,6 +127,53 @@ public class ChatRoomFragment extends Fragment {
         }
     }
 
+    private void uploadImage(Uri file) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageReference = storage.getReference();
+
+        String suffix = MimeTypeMap.getFileExtensionFromUrl(file.toString());
+        StorageReference imageReference = storageReference.child(
+            "images/" + "IMG" + UUID.randomUUID() + "." + (suffix.isEmpty() ? "jpg" : suffix));
+
+        imageReference.putFile(file)
+            .addOnFailureListener(e -> Log.e("UPLOAD", "Failed to upload image", e))
+            .addOnSuccessListener(
+                taskSnapshot -> {
+                    viewModel.sendMessage(imageReference);
+                    Toast.makeText(getContext(), "Upload successful", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+        @Nullable Bundle savedInstanceState) {
+        chatRoomId = ChatRoomFragmentArgs.fromBundle(getArguments()).getChatRoomId();
+
+        View view = inflater.inflate(R.layout.chat_room_fragment, container, false);
+        recyclerView = view.findViewById(R.id.recycler_view);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        layoutManager.setSmoothScrollbarEnabled(true);
+
+        recyclerView.setLayoutManager(layoutManager);
+
+        EditText editText = view.findViewById(R.id.editText);
+
+        ImageView send = view.findViewById(R.id.button);
+        send.setOnClickListener(v -> {
+            String message = editText.getText().toString();
+            viewModel.sendMessage(message);
+            editText.setText("");
+        });
+
+        ImageView cameraButton = view.findViewById(R.id.camera_button);
+        cameraButton.setOnClickListener(v -> openCamera());
+
+        ImageView imageButton = view.findViewById(R.id.upload_button);
+        imageButton.setOnClickListener(v -> chooseImage());
+
+        return view;
+    }
+
     private void openCamera() {
         Intent intent = new Intent();
         intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -200,22 +216,5 @@ public class ChatRoomFragment extends Fragment {
         File image = File.createTempFile(imageFileName, ".jpg", storageDir);
         currentImagePath = image.getAbsolutePath();
         return image;
-    }
-
-    private void uploadImage(Uri file) {
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageReference = storage.getReference();
-
-        String suffix = MimeTypeMap.getFileExtensionFromUrl(file.toString());
-        StorageReference imageReference = storageReference.child(
-            "images/" + "IMG" + UUID.randomUUID() + "." + (suffix.isEmpty() ? "jpg" : suffix));
-
-        imageReference.putFile(file)
-            .addOnFailureListener(e -> Log.e("UPLOAD", "Failed to upload image", e))
-            .addOnSuccessListener(
-                taskSnapshot -> {
-                    viewModel.sendMessage(imageReference);
-                    Toast.makeText(getContext(), "Upload successful", Toast.LENGTH_SHORT).show();
-                });
     }
 }

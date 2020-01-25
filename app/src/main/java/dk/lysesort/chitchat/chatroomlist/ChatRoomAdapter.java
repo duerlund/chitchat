@@ -1,10 +1,8 @@
 package dk.lysesort.chitchat.chatroomlist;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -55,7 +53,6 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<ChatRoomAdapter.ChatRo
     }
 
     public static class ChatRoomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private static final String TAG = "ChatRoom";
         public TextView name;
         public TextView description;
         OnChatRoomClickListener listener;
@@ -70,7 +67,6 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<ChatRoomAdapter.ChatRo
 
         @Override
         public void onClick(View v) {
-            Log.d(TAG, "onclick");
             listener.onClick(getAdapterPosition());
         }
     }
