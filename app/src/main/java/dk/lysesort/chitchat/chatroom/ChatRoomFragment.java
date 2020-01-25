@@ -7,15 +7,18 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.storage.FirebaseStorage;
@@ -64,9 +67,34 @@ public class ChatRoomFragment extends AuthorizedFragment {
 
         EditText editText = view.findViewById(R.id.editText);
 
+        editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
+
+                if (actionId == EditorInfo.IME_ACTION_SEND ||
+                    actionId == EditorInfo.IME_ACTION_DONE ||
+                    event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                    String message = textView.getText().toString();
+
+
+                    if (message.trim().isEmpty()) {
+                        return true;
+                    }
+                    viewModel.sendMessage(message);
+                    textView.setText("");
+                    return true;
+                }
+
+                return false;
+            }
+        });
+
         ImageView send = view.findViewById(R.id.button);
         send.setOnClickListener(v -> {
             String message = editText.getText().toString();
+            if (message.trim().isEmpty()) {
+                return;
+            }
             viewModel.sendMessage(message);
             editText.setText("");
         });
@@ -104,8 +132,6 @@ public class ChatRoomFragment extends AuthorizedFragment {
 //        });
 
         viewModel.listenForUpdates(this);
-
-
     }
 
     @Override
@@ -163,7 +189,9 @@ public class ChatRoomFragment extends AuthorizedFragment {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, getString(R.string.gallery_intent_title)), PICK_IMAGE_REQUEST);
+        startActivityForResult(Intent.createChooser(intent,
+                                                    getString(R.string.gallery_intent_title)),
+                               PICK_IMAGE_REQUEST);
     }
 
     private File createImageFile() throws IOException {
