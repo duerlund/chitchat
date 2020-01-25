@@ -7,4 +7,5 @@
   <string name="sign_out_dialog_message">"Do you want to sign out?"</string>
   <string name="sign_out_dialog_button_positive">Yes</string>
   <string name="sign_out_dialog_button_negative">No</string>
+  <string name="sign_out_failed">Failed to sign out</string>
 </resources>

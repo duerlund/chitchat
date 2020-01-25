@@ -17,9 +17,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import dk.lysesort.chitchat.R;
-import dk.lysesort.chitchat.login.AuthRepository;
 import dk.lysesort.chitchat.login.AuthorizedFragment;
 
+/**
+ * Displays a list of chat rooms
+ */
 public class ChatRoomListFragment extends AuthorizedFragment {
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeContainer;
@@ -43,7 +45,6 @@ public class ChatRoomListFragment extends AuthorizedFragment {
 
         swipeContainer = view.findViewById(R.id.swipe_container);
         swipeContainer.setOnRefreshListener(() -> viewModel.refreshChatRooms());
-
         return view;
     }
 
@@ -53,24 +54,22 @@ public class ChatRoomListFragment extends AuthorizedFragment {
 
         try {
             String chatRoomId = getActivity().getIntent().getStringExtra("chatRoomId");
-            getActivity().getIntent().removeExtra("chatRoomId");
+            String messageId = getActivity().getIntent().getStringExtra("messageId");
 
-            if (chatRoomId != null) {
+            getActivity().getIntent().removeExtra("chatRoomId");
+            getActivity().getIntent().removeExtra("messageId");
+
+            if (chatRoomId != null && messageId != null) {
                 NavDirections directions = ChatRoomListFragmentDirections
                     .actionChatRoomListFragmentToChatRoomFragment(chatRoomId);
+
                 Navigation.findNavController(getView()).navigate(directions);
             }
         } catch (NullPointerException e) {
             // ignore
         }
 
-        adapter = new ChatRoomAdapter(position -> {
-            ChatRoom room = viewModel.getChatRooms().getValue().get(position);
-            NavDirections directions = ChatRoomListFragmentDirections
-                .actionChatRoomListFragmentToChatRoomFragment(room.getId());
-
-            Navigation.findNavController(getView()).navigate(directions);
-        });
+        adapter = new ChatRoomAdapter(position -> Navigation.findNavController(getView()).navigate(viewModel.onChatRoomSelect(position)));
         recyclerView.setAdapter(adapter);
 
         viewModel = ViewModelProviders.of(this).get(ChatRoomListViewModel.class);
@@ -88,12 +87,9 @@ public class ChatRoomListFragment extends AuthorizedFragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
         if (item.getItemId() == R.id.action_signout) {
-            AuthRepository authRepository = new AuthRepository();
-            authRepository.signOut(getContext());
+            viewModel.onSignOut(getContext());
         }
-
         return super.onOptionsItemSelected(item);
     }
 }

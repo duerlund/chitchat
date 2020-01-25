@@ -23,6 +23,10 @@ public class ChatRoomRepository {
         fetchChatRooms();
     }
 
+    /**
+     * Fetch chat rooms and order them by newest message.
+     * The result is posted in {{@link #getChatRooms()}}
+     */
     public void fetchChatRooms() {
         db.collection("rooms")
             .orderBy("timestamp", Query.Direction.DESCENDING)
@@ -30,7 +34,7 @@ public class ChatRoomRepository {
             .addOnCompleteListener(task -> {
                 List<ChatRoom> chatRooms = new ArrayList<>();
                 if (!task.isSuccessful()) {
-                    Log.e(TAG, "Error getting chat rooms", task.getException());
+                    Log.e(TAG, "Error fetching chat rooms", task.getException());
                     return;
                 }
 
@@ -43,6 +47,9 @@ public class ChatRoomRepository {
             });
     }
 
+    /**
+     * @return List of chat rooms
+     */
     public LiveData<List<ChatRoom>> getChatRooms() {
         return chatRooms;
     }
