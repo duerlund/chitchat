@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import dk.lysesort.chitchat.R;
+import dk.lysesort.chitchat.login.AuthRepository;
 import dk.lysesort.chitchat.login.AuthorizedFragment;
 
 public class ChatRoomListFragment extends AuthorizedFragment {
@@ -48,6 +50,7 @@ public class ChatRoomListFragment extends AuthorizedFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
         try {
             String chatRoomId = getActivity().getIntent().getStringExtra("chatRoomId");
             getActivity().getIntent().removeExtra("chatRoomId");
@@ -81,5 +84,16 @@ public class ChatRoomListFragment extends AuthorizedFragment {
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.chat_room_list_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        if (item.getItemId() == R.id.action_signout) {
+            AuthRepository authRepository = new AuthRepository();
+            authRepository.signOut(getContext());
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
