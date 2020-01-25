@@ -45,13 +45,12 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         if (viewType == VIEW_TYPE_IMAGE) {
-            LinearLayout view = (LinearLayout) LayoutInflater.from(parent.getContext())
+            View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.chat_message_image, parent, false);
             return new ChatMessageAdapter.ImageViewHolder(view);
         }
 
-        LinearLayout view = (LinearLayout) LayoutInflater.from(parent.getContext())
-            .inflate(R.layout.chat_message, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_message, parent, false);
         return new ChatMessageAdapter.MessageViewHolder(view);
     }
 
@@ -59,13 +58,15 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         ChatMessage message = data.get(position);
 
-        String user = message.getTimestamp().toDate() + ": " + message.getUser();
+        String user = message.getUser();
+        String timestamp = message.getTimestamp().toDate().toLocaleString();
         String text = message.getText();
 
         switch (holder.getItemViewType()) {
             case VIEW_TYPE_MESSAGE:
                 MessageViewHolder viewHolder = (MessageViewHolder) holder;
                 viewHolder.user.setText(user);
+                viewHolder.timestamp.setText(timestamp);
 
                 Glide.with(viewHolder.profileImage)
                     .load(message.getProfileImageUrl())
@@ -74,13 +75,15 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
                 viewHolder.message.setText(text);
 
+
                 break;
             case VIEW_TYPE_IMAGE:
                 String imageUrl = message.getImageUrl();
 
                 message.getImageUrl();
                 ImageViewHolder imageViewHolder = (ImageViewHolder) holder;
-                imageViewHolder.user.setText(user + " IMG");
+                imageViewHolder.user.setText(user);
+                imageViewHolder.timestamp.setText(timestamp);
 
                 Glide.with(imageViewHolder.profileImage)
                     .load(message.getProfileImageUrl())
@@ -112,12 +115,14 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
         public TextView user;
+        public TextView timestamp;
         public ImageView profileImage;
         public TextView message;
 
         public MessageViewHolder(@NonNull View itemView) {
             super(itemView);
             user = itemView.findViewById(R.id.username);
+            timestamp = itemView.findViewById(R.id.timestamp);
             profileImage = itemView.findViewById(R.id.profile_image);
             message = itemView.findViewById(R.id.message);
         }
@@ -125,12 +130,14 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     public static class ImageViewHolder extends RecyclerView.ViewHolder {
         public TextView user;
+        public TextView timestamp;
         public ImageView profileImage;
         public ImageView image;
 
         public ImageViewHolder(@NonNull View itemView) {
             super(itemView);
             user = itemView.findViewById(R.id.username);
+            timestamp = itemView.findViewById(R.id.timestamp);
             profileImage = itemView.findViewById(R.id.profile_image);
             image = itemView.findViewById(R.id.image);
         }

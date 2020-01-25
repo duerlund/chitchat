@@ -82,7 +82,7 @@ public class ChatRoomListFragment extends AuthorizedFragment {
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.chat_room_list_menu, menu);
+        inflater.inflate(R.menu.chat_room_list, menu);
     }
 
     @Override
