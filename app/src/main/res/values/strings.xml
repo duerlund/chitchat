@@ -3,9 +3,14 @@
   <string name="chat_room_list_actionbar_title">Chat rooms</string>
   <string name="chat_room_list_item_enter">Enter</string>
 
+  <string name="chat_room_hint">Type a message</string>
+
   <string name="sign_out_dialog_title">Sign out?</string>
   <string name="sign_out_dialog_message">"Do you want to sign out?"</string>
   <string name="sign_out_dialog_button_positive">Yes</string>
   <string name="sign_out_dialog_button_negative">No</string>
   <string name="sign_out_failed">Failed to sign out</string>
+
+  <string name="menu_item_sign_out">Sign out</string>
+  <string name="menu_item_toggle_notifications">Toggle notifications</string>
 </resources>

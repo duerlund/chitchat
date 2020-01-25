@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -9,23 +10,47 @@
       android:id="@+id/profile_image"
       android:layout_width="45dp"
       android:layout_height="45dp"
+      android:layout_marginStart="8dp"
+      android:layout_marginTop="8dp"
       android:scaleType="fitCenter"
-      tools:src="@mipmap/ic_launcher_round"
-    />
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      tools:src="@mipmap/ic_launcher_round" />
 
   <TextView
       android:id="@+id/username"
+      android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_width="match_parent"
-      android:textStyle="bold"
+      android:layout_marginStart="8dp"
+      android:layout_marginTop="8dp"
       android:textSize="16sp"
+      android:textStyle="bold"
+      app:layout_constraintStart_toEndOf="@+id/profile_image"
+      app:layout_constraintTop_toTopOf="parent"
       tools:text="Floyd" />
 
   <TextView
-      android:id="@+id/message"
+      android:id="@+id/timestamp"
+      android:layout_width="0dp"
       android:layout_height="wrap_content"
-      android:layout_width="match_parent"
-      android:textSize="14sp"
-      tools:text="Hello world" />
+      android:layout_marginTop="8dp"
+      android:layout_marginEnd="8dp"
+      android:textSize="12sp"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      tools:text="13:37:00 25/1/2020" />
 
-</LinearLayout>
+  <TextView
+      android:id="@+id/message"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="8dp"
+      android:layout_marginTop="8dp"
+      android:layout_marginEnd="8dp"
+      android:textSize="14sp"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toEndOf="@+id/profile_image"
+      app:layout_constraintTop_toBottomOf="@+id/username"
+      tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vel pharetra vel turpis nunc. Consequat semper viverra nam libero justo laoreet. Nisl rhoncus mattis rhoncus urna neque. Id interdum velit laoreet id donec ultrices tincidunt arcu." />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -138,7 +138,7 @@ public class ChatRoomFragment extends AuthorizedFragment {
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.chat_room_menu, menu);
+        inflater.inflate(R.menu.chat_room, menu);
     }
 
     private void uploadImage(Uri file) {

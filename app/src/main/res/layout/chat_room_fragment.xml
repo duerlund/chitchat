@@ -41,8 +41,8 @@
       android:layout_width="0dp"
       android:layout_height="wrap_content"
       android:ems="10"
-      android:hint="Type a message"
-      android:inputType="textPersonName"
+      android:hint="@string/chat_room_hint"
+      android:inputType="text"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toStartOf="@+id/button" />
 
