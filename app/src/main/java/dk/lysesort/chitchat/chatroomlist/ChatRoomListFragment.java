@@ -2,6 +2,8 @@ package dk.lysesort.chitchat.chatroomlist;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -21,6 +23,12 @@ public class ChatRoomListFragment extends AuthorizedFragment {
     private SwipeRefreshLayout swipeContainer;
     private ChatRoomAdapter adapter;
     private ChatRoomListViewModel viewModel;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -67,5 +75,11 @@ public class ChatRoomListFragment extends AuthorizedFragment {
             adapter.setData(chatRooms);
             swipeContainer.setRefreshing(false);
         });
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.chat_room_list_menu, menu);
     }
 }
