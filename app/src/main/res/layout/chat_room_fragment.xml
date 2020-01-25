@@ -11,6 +11,7 @@
       android:id="@+id/recycler_view"
       android:layout_width="0dp"
       android:layout_height="0dp"
+      tools:listitem="@layout/chat_message"
       app:layout_constraintBottom_toTopOf="@+id/editText"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
@@ -19,39 +20,51 @@
   <ImageView
       android:id="@+id/camera_button"
       android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
+      android:layout_height="36dp"
+      android:layout_marginStart="8dp"
+      android:layout_marginBottom="8dp"
       android:src="@drawable/baseline_photo_camera_black_36"
       android:tint="@color/colorPrimaryDark"
       app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toStartOf="@+id/upload_button"
-      app:layout_constraintStart_toStartOf="parent" />
+      app:layout_constraintStart_toStartOf="parent"
+      android:contentDescription="@string/chat_room_button_open_camera" />
 
   <ImageView
       android:id="@+id/upload_button"
       android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
+      android:layout_height="36dp"
+      android:layout_marginStart="8dp"
+      android:layout_marginBottom="8dp"
       android:src="@drawable/baseline_photo_black_36"
       android:tint="@color/colorPrimaryDark"
+      android:contentDescription="@string/chat_room_button_upload_from_gallery"
       app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toStartOf="@+id/editText"
-      app:layout_constraintStart_toEndOf="@id/camera_button" />
+      app:layout_constraintStart_toEndOf="@+id/camera_button" />
 
   <EditText
       android:id="@+id/editText"
       android:layout_width="0dp"
-      android:layout_height="wrap_content"
+      android:layout_height="45dp"
+      android:layout_marginStart="8dp"
+      android:layout_marginEnd="8dp"
+      android:layout_marginBottom="8dp"
       android:ems="10"
       android:hint="@string/chat_room_hint"
       android:inputType="text"
       app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toStartOf="@+id/button" />
+      app:layout_constraintEnd_toStartOf="@+id/button"
+      app:layout_constraintStart_toEndOf="@+id/upload_button"
+      android:importantForAutofill="no" />
 
   <ImageView
       android:id="@+id/button"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
+      android:layout_marginEnd="8dp"
+      android:layout_marginBottom="8dp"
       android:src="@drawable/baseline_send_black_36"
       android:tint="@color/colorPrimaryDark"
+      android:contentDescription="@string/chat_room_button_send_message"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toEndOf="parent" />
 

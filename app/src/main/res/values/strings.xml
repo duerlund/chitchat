@@ -13,4 +13,7 @@
 
   <string name="menu_item_sign_out">Sign out</string>
   <string name="menu_item_toggle_notifications">Toggle notifications</string>
+  <string name="chat_room_button_open_camera">Open camera</string>
+  <string name="chat_room_button_upload_from_gallery">Open gallery</string>
+  <string name="chat_room_button_send_message">Send</string>
 </resources>
