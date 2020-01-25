@@ -27,8 +27,6 @@ public class ChatRoomListFragment extends Fragment {
         @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.chat_room_list_fragment, container, false);
 
-
-
         recyclerView = view.findViewById(R.id.recycler_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
@@ -57,14 +55,12 @@ public class ChatRoomListFragment extends Fragment {
             // ignore
         }
 
-
         adapter = new ChatRoomAdapter(position -> {
             ChatRoom room = viewModel.getChatRooms().getValue().get(position);
             ChatRoomListFragmentDirections.ActionChatRoomListFragmentToChatRoomFragment action = ChatRoomListFragmentDirections
                 .actionChatRoomListFragmentToChatRoomFragment(room.getId());
 
             Navigation.findNavController(getView()).navigate(action);
-
         });
         recyclerView.setAdapter(adapter);
 
