@@ -22,7 +22,7 @@ public class ChatRoomViewModel extends ViewModel {
     public ChatRoomViewModel(String chatRoomId) {
         this.chatRoomId = chatRoomId;
         repository = new ChatMessageRepository(chatRoomId);
-        adapter = new ChatMessageAdapter(repository);
+        adapter = new ChatMessageAdapter();
     }
 
     public void listenForUpdates(LifecycleOwner lifecycleOwner) {

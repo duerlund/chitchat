@@ -59,7 +59,7 @@ public class ChatRoomPreferenceRepository {
     }
 
     private static String getTopic(String chatRoomId) {
-        return "chatroom." + chatRoomId;
+        return "chatroom.topic." + chatRoomId;
     }
 
     private static void setSubscription(Context context, String chatRoomId, boolean subscribe) {

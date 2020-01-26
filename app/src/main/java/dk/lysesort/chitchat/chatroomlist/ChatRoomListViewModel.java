@@ -12,7 +12,6 @@ import androidx.navigation.NavDirections;
 import dk.lysesort.chitchat.login.AuthRepository;
 
 public class ChatRoomListViewModel extends ViewModel {
-    public static final String TAG = "Chatroom";
     private ChatRoomRepository repository = new ChatRoomRepository();
 
     public void refreshChatRooms() {
