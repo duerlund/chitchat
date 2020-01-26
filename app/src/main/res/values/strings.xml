@@ -5,8 +5,13 @@
 
   <string name="chat_room_hint">Type a message</string>
 
+  <string name="login_alert_title">Sign in failed</string>
+  <string name="login_alert_message">Your user profile could not be verified by its provider.</string>
+  <string name="login_alert_button_positive">Retry</string>
+  <string name="login_alert_button_negative">Exit</string>
+
   <string name="sign_out_dialog_title">Sign out?</string>
-  <string name="sign_out_dialog_message">"Do you want to sign out?"</string>
+  <string name="sign_out_dialog_message">"Do you want to sign out and exit?"</string>
   <string name="sign_out_dialog_button_positive">Yes</string>
   <string name="sign_out_dialog_button_negative">No</string>
   <string name="sign_out_failed">Failed to sign out</string>

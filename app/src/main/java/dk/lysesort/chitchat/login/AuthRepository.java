@@ -7,6 +7,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Arrays;
@@ -24,7 +25,7 @@ public class AuthRepository {
         return FirebaseAuth.getInstance().getCurrentUser() != null;
     }
 
-    public void signOut(Context context) {
+    public void signOut(Context context, OnSuccessListener successListener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder
             .setTitle(R.string.sign_out_dialog_title)
@@ -35,6 +36,7 @@ public class AuthRepository {
                 (dialog, which) ->
                     AuthUI.getInstance()
                         .signOut(context)
+                        .addOnSuccessListener(successListener)
                         .addOnFailureListener(exception -> {
                             Log.e(TAG, "Error signing out", exception);
                             Toast.makeText(context, R.string.sign_out_failed, Toast.LENGTH_SHORT)
