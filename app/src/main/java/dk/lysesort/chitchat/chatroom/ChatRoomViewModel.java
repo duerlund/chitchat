@@ -101,7 +101,7 @@ public class ChatRoomViewModel extends ViewModel {
         return imageRepository.getCameraIntent(v.getContext());
     }
 
-    public void onTakePhotoResult(Intent data) {
-        imageRepository.onCameraIntentResult(data, repository);
+    public void onTakePhotoResult() {
+        imageRepository.onCameraIntentResult(repository);
     }
 }
