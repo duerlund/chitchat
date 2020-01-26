@@ -16,19 +16,35 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import dk.lysesort.chitchat.R;
-import dk.lysesort.chitchat.login.AuthorizedFragment;
 
-public class ChatRoomFragment extends AuthorizedFragment {
+public class ChatRoomFragment extends Fragment {
     private static final int RC_OPEN_GALLERY = 1;
     private static final int RC_TAKE_PHOTO = 2;
     private String chatRoomId;
     private ChatRoomViewModel viewModel;
     private RecyclerView recyclerView;
-    private MenuItem menuItem;
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != Activity.RESULT_OK) {
+            return;
+        }
+
+        switch (requestCode) {
+            case RC_TAKE_PHOTO:
+                viewModel.onTakePhotoResult();
+                break;
+            case RC_OPEN_GALLERY:
+                viewModel.onOpenGalleryResult(data);
+                break;
+        }
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -146,22 +162,5 @@ public class ChatRoomFragment extends AuthorizedFragment {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode != Activity.RESULT_OK) {
-            return;
-        }
-
-        switch (requestCode) {
-            case RC_TAKE_PHOTO:
-                viewModel.onTakePhotoResult();
-                break;
-            case RC_OPEN_GALLERY:
-                viewModel.onOpenGalleryResult(data);
-                break;
-        }
     }
 }

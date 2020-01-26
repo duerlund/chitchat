@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
@@ -17,12 +18,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import dk.lysesort.chitchat.R;
-import dk.lysesort.chitchat.login.AuthorizedFragment;
 
 /**
  * Displays a list of chat rooms
  */
-public class ChatRoomListFragment extends AuthorizedFragment {
+public class ChatRoomListFragment extends Fragment {
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeContainer;
     private ChatRoomAdapter adapter;
@@ -62,14 +62,15 @@ public class ChatRoomListFragment extends AuthorizedFragment {
             if (chatRoomId != null && messageId != null) {
                 NavDirections directions = ChatRoomListFragmentDirections
                     .actionChatRoomListFragmentToChatRoomFragment(chatRoomId);
-
                 Navigation.findNavController(getView()).navigate(directions);
             }
         } catch (NullPointerException e) {
             // ignore
         }
 
-        adapter = new ChatRoomAdapter(position -> Navigation.findNavController(getView()).navigate(viewModel.onChatRoomSelect(position)));
+        adapter = new ChatRoomAdapter(
+            position -> Navigation.findNavController(getView())
+                .navigate(viewModel.onChatRoomSelect(position)));
         recyclerView.setAdapter(adapter);
 
         viewModel = ViewModelProviders.of(this).get(ChatRoomListViewModel.class);
@@ -88,7 +89,11 @@ public class ChatRoomListFragment extends AuthorizedFragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.action_signout) {
-            viewModel.onSignOut(getContext());
+            viewModel.onSignOut(getContext(), o -> {
+                if (getActivity() != null) {
+                    getActivity().finish();
+                }
+            });
         }
         return super.onOptionsItemSelected(item);
     }
