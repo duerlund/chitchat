@@ -29,7 +29,7 @@ public class ImageRepository {
             return null;
         }
 
-        File image = null;
+        File image;
 
         try {
             image = createImageFile(context);
@@ -58,7 +58,7 @@ public class ImageRepository {
         return image;
     }
 
-    public void onCameraIntentResult(Intent data, ChatMessageRepository repository) {
+    public void onCameraIntentResult(ChatMessageRepository repository) {
         File file = new File(currentCameraImagePath);
         Uri uri = Uri.fromFile(file);
         uploadImage(uri, repository);

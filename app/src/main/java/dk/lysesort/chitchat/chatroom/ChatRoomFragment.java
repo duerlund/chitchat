@@ -147,7 +147,7 @@ public class ChatRoomFragment extends AuthorizedFragment {
 
         switch (requestCode) {
             case RC_TAKE_PHOTO:
-                viewModel.onTakePhotoResult(data);
+                viewModel.onTakePhotoResult();
                 break;
             case RC_OPEN_GALLERY:
                 viewModel.onOpenGalleryResult(data);
