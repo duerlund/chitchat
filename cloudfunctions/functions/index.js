@@ -3,7 +3,7 @@ const admin = require('firebase-admin');
 admin.initializeApp();
 
 // Trigger function for new documents in chat
-exports.notifyOnNewMessage = functions.firestore.document('rooms/{roomId}/messages/{messageId}')
+exports.notifyOnNewMessage = functions.firestore.document('chatrooms/{roomId}/messages/{messageId}')
   .onCreate((snapshot, context) => {
     var roomId = context.params.roomId;
     var messageId = context.params.messageId;
@@ -13,7 +13,7 @@ exports.notifyOnNewMessage = functions.firestore.document('rooms/{roomId}/messag
 });
 
 function sendPushNotification(roomId, messageId) {
-  var topic = 'chatroom.' + roomId;
+  var topic = 'chatroom.topic.' + roomId;
 
   var message = {
     'topic': topic,
@@ -22,8 +22,7 @@ function sendPushNotification(roomId, messageId) {
       'messageId': messageId
     },
     'notification': {
-      'title': 'New messages for you',
-      'body': 'New messages in roomId ' + roomId
+      'title': 'New message'
     }
   }
 
