@@ -2,8 +2,8 @@ package dk.lysesort.chitchat.chatroom;
 
 import android.app.AlertDialog;
 import android.content.Context;
-
-import com.google.firebase.storage.StorageReference;
+import android.content.Intent;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
@@ -16,6 +16,7 @@ public class ChatRoomViewModel extends ViewModel {
     private String chatRoomId;
     private ChatMessageRepository repository;
     private ChatMessageAdapter adapter;
+    private ImageRepository imageRepository = new ImageRepository();
 
     public ChatRoomViewModel(String chatRoomId) {
         this.chatRoomId = chatRoomId;
@@ -47,10 +48,6 @@ public class ChatRoomViewModel extends ViewModel {
 
     public void sendMessage(String message) {
         repository.sendMessage(message);
-    }
-
-    public void sendMessage(StorageReference storageReference) {
-        repository.sendMessage(storageReference);
     }
 
     /**
@@ -90,5 +87,21 @@ public class ChatRoomViewModel extends ViewModel {
 
     public void onScrollEnded() {
         repository.getNextPage();
+    }
+
+    public Intent onClickOpenGallery(View v) {
+        return imageRepository.getChooseFromGalleryIntent(v.getContext());
+    }
+
+    public void onOpenGalleryResult(Intent data) {
+        imageRepository.onChooseFromGalleryResult(data, repository);
+    }
+
+    public Intent onTakePhoto(View v) {
+        return imageRepository.getCameraIntent(v.getContext());
+    }
+
+    public void onTakePhotoResult(Intent data) {
+        imageRepository.onCameraIntentResult(data, repository);
     }
 }
