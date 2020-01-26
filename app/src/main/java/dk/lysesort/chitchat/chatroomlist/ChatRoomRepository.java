@@ -28,7 +28,7 @@ public class ChatRoomRepository {
      * The result is posted in {{@link #getChatRooms()}}
      */
     public void fetchChatRooms() {
-        db.collection("rooms")
+        db.collection("chatrooms")
             .orderBy("timestamp", Query.Direction.DESCENDING)
             .get()
             .addOnCompleteListener(task -> {
