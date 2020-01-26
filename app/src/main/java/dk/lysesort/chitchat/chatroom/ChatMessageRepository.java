@@ -54,8 +54,8 @@ public class ChatMessageRepository {
         messages = new MutableLiveData<>();
         oldMessages = new MutableLiveData<>();
 
-        messageCollection = db.collection("rooms/" + chatRoomId + "/messages");
-        chatRoomReference = db.document("rooms/" + chatRoomId);
+        messageCollection = db.collection("chatrooms/" + chatRoomId + "/messages");
+        chatRoomReference = db.document("chatrooms/" + chatRoomId);
     }
 
     public MutableLiveData<List<ChatMessage>> getMessages() {

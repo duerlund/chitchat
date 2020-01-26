@@ -1,7 +1,6 @@
 package dk.lysesort.chitchat;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -16,13 +15,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         FirebaseApp.getInstance();
-        FirebaseInstanceId.getInstance().getInstanceId()
-            .addOnSuccessListener(instanceIdResult -> {
-                String token = instanceIdResult.getToken();
-                Log.d("FCM", "InstanceId: " + token);
-            });
+        FirebaseInstanceId.getInstance().getInstanceId();
 
         try {
+            // Let user see splash screen
             Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
