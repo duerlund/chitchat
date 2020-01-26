@@ -1,12 +1,10 @@
 package dk.lysesort.chitchat.chatroom;
 
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -23,23 +21,12 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private static final int VIEW_TYPE_MESSAGE = 1;
     private static final int VIEW_TYPE_IMAGE = 2;
 
-    private ChatMessageRepository repository;
+//    private ChatMessageRepository repository;
     private List<ChatMessage> data;
 
     public ChatMessageAdapter(ChatMessageRepository repository) {
-        this.repository = repository;
+//        this.repository = repository;
         data = new ArrayList<>();
-    }
-
-    public void newMessages(List<ChatMessage> newData) {
-        data.addAll(0, newData);
-        // notify ranges
-        notifyDataSetChanged();
-    }
-
-    public void addMessages(List<ChatMessage> newData) {
-        data.addAll(newData);
-        notifyDataSetChanged();
     }
 
     @NonNull
@@ -52,7 +39,8 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             return new ChatMessageAdapter.ImageViewHolder(view);
         }
 
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_message, parent, false);
+        View view = LayoutInflater.from(parent.getContext())
+            .inflate(R.layout.chat_message, parent, false);
         return new ChatMessageAdapter.MessageViewHolder(view);
     }
 
@@ -76,7 +64,6 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     .into(viewHolder.profileImage);
 
                 viewHolder.message.setText(text);
-
 
                 break;
             case VIEW_TYPE_IMAGE:
@@ -113,8 +100,24 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     @Override
+    public long getItemId(int position) {
+        return super.getItemId(position);
+    }
+
+    @Override
     public int getItemCount() {
         return data.size();
+    }
+
+    public void appendMessages(List<ChatMessage> newData) {
+        data.addAll(newData);
+        notifyDataSetChanged();
+    }
+
+    public void prependMessages(List<ChatMessage> newData) {
+        data.addAll(0, newData);
+        // notify ranges
+        notifyDataSetChanged();
     }
 
     public static class MessageViewHolder extends RecyclerView.ViewHolder {

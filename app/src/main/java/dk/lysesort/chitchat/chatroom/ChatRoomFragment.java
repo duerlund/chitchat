@@ -70,12 +70,10 @@ public class ChatRoomFragment extends AuthorizedFragment {
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
-
                 if (actionId == EditorInfo.IME_ACTION_SEND ||
                     actionId == EditorInfo.IME_ACTION_DONE ||
                     event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
                     String message = textView.getText().toString();
-
 
                     if (message.trim().isEmpty()) {
                         return true;
@@ -118,19 +116,16 @@ public class ChatRoomFragment extends AuthorizedFragment {
             .get(ChatRoomViewModel.class);
 
         recyclerView.setAdapter(viewModel.getAdapter());
-
-//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//            @Override
-//            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-//                super.onScrollStateChanged(recyclerView, newState);
-//                if (!recyclerView.canScrollVertically(1) &&
-//                    newState == RecyclerView.SCROLL_STATE_IDLE) {
-//                    Log.d("SCROLL", "Reached the end");
-//                    viewModel.onScrollToEnd();
-//                }
-//            }
-//        });
-
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (!recyclerView.canScrollVertically(-1) &&
+                    newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    viewModel.onScrollEnded();
+                }
+            }
+        });
         viewModel.listenForUpdates(this);
     }
 

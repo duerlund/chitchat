@@ -5,6 +5,9 @@ import android.content.Context;
 
 import com.google.firebase.storage.StorageReference;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModel;
 import dk.lysesort.chitchat.R;
@@ -22,21 +25,24 @@ public class ChatRoomViewModel extends ViewModel {
 
     public void listenForUpdates(LifecycleOwner lifecycleOwner) {
         repository.getMessages()
-            .observe(lifecycleOwner, chatMessages -> {
-                adapter.addMessages(chatMessages);
-                listenForNewMessages();
-            });
+            .observe(lifecycleOwner, chatMessages -> adapter.prependMessages(chatMessages));
+        repository.getOldMessages()
+            .observe(lifecycleOwner, chatMessages -> adapter.appendMessages(chatMessages));
 
-        repository.getNewMessages().observe(lifecycleOwner, adapter::newMessages);
-        repository.getOldMessages().observe(lifecycleOwner, adapter::addMessages);
-    }
+        lifecycleOwner.getLifecycle().addObserver(new LifecycleEventObserver() {
+            @Override
+            public void onStateChanged(@NonNull LifecycleOwner source,
+                @NonNull Lifecycle.Event event) {
 
-    public void listenForNewMessages() {
-        repository.listenForNewMessages();
-    }
-
-    public void onScrollToEnd() {
-        repository.fetchOlderMessages();
+                switch (event) {
+                    case ON_PAUSE:
+                        repository.stopListening();
+                        break;
+                    case ON_RESUME:
+                        repository.listenForNewMessages();
+                }
+            }
+        });
     }
 
     public void sendMessage(String message) {
@@ -80,5 +86,9 @@ public class ChatRoomViewModel extends ViewModel {
 
     public ChatMessageAdapter getAdapter() {
         return adapter;
+    }
+
+    public void onScrollEnded() {
+        repository.getNextPage();
     }
 }
