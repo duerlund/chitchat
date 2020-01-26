@@ -12,6 +12,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.StorageReference;
 
@@ -20,120 +21,90 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+/**
+ * The chat message repository can retrieve old messages and post new ones to a chat room.
+ * <p>
+ * Retrieving messages:
+ * <p>
+ * Sending messages: To send a chat message, use one of the following methods:
+ * <p>
+ * {@link #sendMessage(String)}
+ * <p>
+ * {@link #sendMessage(StorageReference)}
+ */
 public class ChatMessageRepository {
     private static final String TAG = "Message";
-    private static final int MESSAGES_TO_LOAD = 50;
-    private FirebaseFirestore db;
-    private MutableLiveData<List<ChatMessage>> messages;
-    private MutableLiveData<List<ChatMessage>> newMessages;
-    private MutableLiveData<List<ChatMessage>> oldMessages;
-    private String chatRoomId;
+    private static final int MESSAGES_PER_PAGE = 50;
 
     private CollectionReference messageCollection;
     private DocumentReference chatRoomReference;
     private ListenerRegistration listenerRegistration;
-    private DocumentSnapshot newestMessage;
-    private DocumentSnapshot oldestMessage;
+
+    private DocumentSnapshot lastDocument;
+    private MutableLiveData<List<ChatMessage>> messages;
+    private MutableLiveData<List<ChatMessage>> oldMessages;
+    private boolean updating = false;
+    private boolean onLastPage = false;
 
     public ChatMessageRepository(String chatRoomId) {
-        db = FirebaseFirestore.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
         messages = new MutableLiveData<>();
-        newMessages = new MutableLiveData<>();
         oldMessages = new MutableLiveData<>();
 
-        this.chatRoomId = chatRoomId;
         messageCollection = db.collection("rooms/" + chatRoomId + "/messages");
         chatRoomReference = db.document("rooms/" + chatRoomId);
-        fetchInitial();
     }
 
-    public void fetchInitial() {
-        messageCollection.orderBy("timestamp", Query.Direction.DESCENDING)
-            .limit(MESSAGES_TO_LOAD)
-            .get()
-            .addOnCompleteListener(task -> {
-                if (!task.isSuccessful()) {
-                    Log.e(TAG, "Failed to fetch messages", task.getException());
-                    return;
-                }
-
-                List<ChatMessage> messages = new ArrayList<>();
-
-                for (QueryDocumentSnapshot result : task.getResult()) {
-                    ChatMessage message = result.toObject(ChatMessage.class);
-                    Log.d(TAG, "fetched:" + message);
-                    messages.add(message);
-                }
-
-                this.messages.postValue(messages);
-
-                if (task.getResult().size() > 0) {
-                    List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
-                    newestMessage = documentSnapshots.get(0);
-                    oldestMessage = documentSnapshots.get(documentSnapshots.size() - 1);
-
-                    update(newestMessage);
-                }
-            });
+    public MutableLiveData<List<ChatMessage>> getMessages() {
+        return messages;
     }
 
     public void listenForNewMessages() {
-        update(newestMessage);
+        listenForNewMessages(null);
     }
 
-    private void update(DocumentSnapshot newestMessage) {
+    public void stopListening() {
+        if (listenerRegistration != null) {
+            listenerRegistration.remove();
+        }
+    }
+
+    private void listenForNewMessages(DocumentSnapshot snapshot) {
         if (listenerRegistration != null) {
             listenerRegistration.remove();
         }
 
-        if (newestMessage == null) {
-            listenerRegistration = messageCollection
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .addSnapshotListener((queryDocumentSnapshots, e) -> {
-                    Log.d(TAG, "onEvent");
-                    List<ChatMessage> messages = new ArrayList<>();
-                    for (QueryDocumentSnapshot result : queryDocumentSnapshots) {
-                        ChatMessage message = result.toObject(ChatMessage.class);
-                        Log.d(TAG, "new:" + message);
-                        messages.add(result.toObject(ChatMessage.class));
-                    }
-                    newMessages.postValue(messages);
+        listenerRegistration = newMessageQuery(snapshot).addSnapshotListener(
+            (querySnapshot, exception) -> {
+                if (exception != null) {
+                    Log.e(TAG, "Firestore error", exception);
+                    return;
+                }
 
-                    if (!queryDocumentSnapshots.getDocuments().isEmpty()) {
-                        update(queryDocumentSnapshots.getDocuments().get(0));
-                    }
-                });
-            return;
+                if (querySnapshot.isEmpty()) {
+                    return;
+                }
+                List<ChatMessage> newMessages = parseChatMessages(querySnapshot);
+
+                getMessages().postValue(newMessages);
+                updateLastDocumentCursor(querySnapshot);
+                listenForNewMessages(querySnapshot.getDocuments().get(0));
+            }
+        );
+    }
+
+    private Query newMessageQuery(DocumentSnapshot snapshot) {
+        if (snapshot == null) {
+            return messageCollection.orderBy("timestamp", Query.Direction.DESCENDING)
+                .limit(MESSAGES_PER_PAGE);
         }
 
-        listenerRegistration = messageCollection
+        return messageCollection
             .orderBy("timestamp", Query.Direction.DESCENDING)
-            .endBefore(newestMessage)
-            .addSnapshotListener((queryDocumentSnapshots, e) -> {
-                Log.d(TAG, "onEvent");
-                List<ChatMessage> messages = new ArrayList<>();
-                for (QueryDocumentSnapshot result : queryDocumentSnapshots) {
-                    ChatMessage message = result.toObject(ChatMessage.class);
-                    Log.d(TAG, "new:" + message);
-                    messages.add(result.toObject(ChatMessage.class));
-                }
-                newMessages.postValue(messages);
-
-                if (!queryDocumentSnapshots.getDocuments().isEmpty()) {
-                    update(queryDocumentSnapshots.getDocuments().get(0));
-                }
-            });
-    }
-
-    public LiveData<List<ChatMessage>> getMessages() {
-        return messages;
-    }
-
-    public MutableLiveData<List<ChatMessage>> getNewMessages() {
-        return newMessages;
+            .endBefore(snapshot);
     }
 
     public void sendMessage(String message) {
@@ -149,19 +120,15 @@ public class ChatMessageRepository {
     }
 
     private void sendChatMessage(Map<String, Object> chatMessage) {
-
         Timestamp now = Timestamp.now();
         chatMessage.put("timestamp", now);
-
         messageCollection
             .add(chatMessage)
-            .addOnSuccessListener(documentReference -> {
-                updateTimestamp(now);
-            })
+            .addOnSuccessListener(documentReference -> updateChatRoomTimestamp(now))
             .addOnFailureListener(exception -> Log.e(TAG, "Failed to send message", exception));
     }
 
-    private void updateTimestamp(Timestamp timeStamp) {
+    private void updateChatRoomTimestamp(Timestamp timeStamp) {
         Map<String, Object> data = new HashMap<>();
         data.put("timestamp", timeStamp);
         chatRoomReference.set(data, SetOptions.merge())
@@ -183,44 +150,57 @@ public class ChatMessageRepository {
         });
     }
 
-    public void fetchOlderMessages() {
-        getOlderMessages(oldestMessage);
-    }
-
-    private void getOlderMessages(DocumentSnapshot oldestMessage) {
-        if (oldestMessage == null) {
+    /**
+     *
+     */
+    public void getNextPage() {
+        if (updating) {
             return;
         }
 
+        if (lastDocument == null) {
+            return;
+        }
+
+        if (onLastPage) {
+            return;
+        }
+
+        updating = true;
         messageCollection
             .orderBy("timestamp", Query.Direction.DESCENDING)
-            .startAfter(oldestMessage)
-            .limit(MESSAGES_TO_LOAD)
+            .startAfter(lastDocument)
+            .limit(MESSAGES_PER_PAGE)
             .get()
-            .addOnCompleteListener(task -> {
-                if (!task.isSuccessful()) {
-                    Log.e(TAG, "Failed to fetch messages", task.getException());
-                    return;
-                }
-
-                List<ChatMessage> messages = new ArrayList<>();
-
-                for (QueryDocumentSnapshot result : task.getResult()) {
-                    ChatMessage message = result.toObject(ChatMessage.class);
-                    Log.d(TAG, "fetched:" + message);
-                    messages.add(message);
-                }
-
-                this.oldMessages.postValue(messages);
-
-                if (task.getResult().size() > 0) {
-                    List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
-                    this.oldestMessage = documentSnapshots.get(documentSnapshots.size() - 1);
-                }
+            .addOnSuccessListener(querySnapshot -> {
+                List<ChatMessage> messages = parseChatMessages(querySnapshot);
+                updateLastDocumentCursor(querySnapshot);
+                getOldMessages().postValue(messages);
+                updating = false;
             });
     }
 
-    public LiveData<List<ChatMessage>> getOldMessages() {
+    private List<ChatMessage> parseChatMessages(QuerySnapshot snapshot) {
+        List<ChatMessage> messages = new ArrayList<>();
+
+        for (QueryDocumentSnapshot document : snapshot) {
+            ChatMessage message = document.toObject(ChatMessage.class);
+            messages.add(message);
+        }
+
+        return messages;
+    }
+
+    private void updateLastDocumentCursor(QuerySnapshot snapshot) {
+        if (snapshot == null || snapshot.isEmpty()) {
+            return;
+        }
+
+        onLastPage = snapshot.size() < MESSAGES_PER_PAGE;
+        lastDocument = snapshot.getDocuments().get(snapshot.size() - 1);
+    }
+
+    public MutableLiveData<List<ChatMessage>> getOldMessages() {
         return oldMessages;
     }
 }
