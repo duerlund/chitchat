@@ -28,6 +28,7 @@ public class ChatRoomFragment extends AuthorizedFragment {
     private String chatRoomId;
     private ChatRoomViewModel viewModel;
     private RecyclerView recyclerView;
+    private MenuItem menuItem;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -122,9 +123,18 @@ public class ChatRoomFragment extends AuthorizedFragment {
 
         boolean isSubscribed = ChatRoomPreferenceRepository
             .isSubscribedToPush(getContext(), chatRoomId);
+
         menu.findItem(R.id.action_toggle_notifications)
             .setIcon(isSubscribed ? R.drawable.baseline_notifications_active_24
                                   : R.drawable.baseline_notifications_off_24);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        viewModel.showPushNotificationDialog(
+            getContext(),
+            menu.findItem(R.id.action_toggle_notifications));
     }
 
     @Override
@@ -153,11 +163,5 @@ public class ChatRoomFragment extends AuthorizedFragment {
                 viewModel.onOpenGalleryResult(data);
                 break;
         }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        viewModel.showPushNotificationDialog(getContext());
     }
 }

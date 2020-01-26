@@ -9,6 +9,10 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import dk.lysesort.chitchat.R;
 
+/**
+ * Handles chat room preferences. Preferences are handled per device, so you could have two device
+ * with different chat room notification preferences.
+ */
 public class ChatRoomPreferenceRepository {
 
     private ChatRoomPreferenceRepository() {

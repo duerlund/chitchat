@@ -3,6 +3,7 @@ package dk.lysesort.chitchat.chatroom;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -58,7 +59,7 @@ public class ChatRoomViewModel extends ViewModel {
      *
      * @param context Context for the dialog
      */
-    public void showPushNotificationDialog(Context context) {
+    public void showPushNotificationDialog(Context context, MenuItem item) {
         if (ChatRoomPreferenceRepository.hasAnswered(context, chatRoomId)) {
             return;
         }
@@ -67,11 +68,21 @@ public class ChatRoomViewModel extends ViewModel {
         builder.setMessage(R.string.notification_dialog_message)
             .setPositiveButton(
                 R.string.notification_dialog_button_positive,
-                (dialog, which) -> ChatRoomPreferenceRepository.subscribe(context, chatRoomId)
+                (dialog, which) -> {
+                    ChatRoomPreferenceRepository.subscribe(context, chatRoomId);
+                    if (item != null) {
+                        item.setIcon(R.drawable.baseline_notifications_active_24);
+                    }
+                }
             )
             .setNegativeButton(
                 R.string.notification_dialog_button_negative,
-                (dialog, which) -> ChatRoomPreferenceRepository.unsubscribe(context, chatRoomId)
+                (dialog, which) -> {
+                    ChatRoomPreferenceRepository.unsubscribe(context, chatRoomId);
+                    if (item != null) {
+                        item.setIcon(R.drawable.baseline_notifications_off_24);
+                    }
+                }
             )
             .create()
             .show();
