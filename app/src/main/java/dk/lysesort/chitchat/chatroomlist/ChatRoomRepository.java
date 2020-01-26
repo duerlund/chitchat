@@ -13,7 +13,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 public class ChatRoomRepository {
-    private static final String TAG = "ROOM";
+    private static final String TAG = "ChatRoomRepository";
     private FirebaseFirestore db;
     private MutableLiveData<List<ChatRoom>> chatRooms;
 
@@ -47,9 +47,6 @@ public class ChatRoomRepository {
             });
     }
 
-    /**
-     * @return List of chat rooms
-     */
     public LiveData<List<ChatRoom>> getChatRooms() {
         return chatRooms;
     }

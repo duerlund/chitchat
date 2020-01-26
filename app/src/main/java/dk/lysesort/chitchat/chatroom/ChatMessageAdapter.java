@@ -1,6 +1,5 @@
 package dk.lysesort.chitchat.chatroom;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,15 +16,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import dk.lysesort.chitchat.R;
 
 public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private static final String TAG = "MessageAdapter";
     private static final int VIEW_TYPE_MESSAGE = 1;
     private static final int VIEW_TYPE_IMAGE = 2;
 
-//    private ChatMessageRepository repository;
     private List<ChatMessage> data;
 
-    public ChatMessageAdapter(ChatMessageRepository repository) {
-//        this.repository = repository;
+    public ChatMessageAdapter() {
         data = new ArrayList<>();
     }
 
@@ -116,7 +112,6 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     public void prependMessages(List<ChatMessage> newData) {
         data.addAll(0, newData);
-        // notify ranges
         notifyDataSetChanged();
     }
 

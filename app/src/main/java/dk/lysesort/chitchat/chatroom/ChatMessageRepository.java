@@ -26,7 +26,11 @@ import androidx.lifecycle.MutableLiveData;
 /**
  * The chat message repository can retrieve old messages and post new ones to a chat room.
  * <p>
- * Retrieving messages:
+ * Retrieving messages: Messages are fetched in a fixed page size of 50. Observing {@link
+ * #getMessages()} will return the first 50 messages and after that, it is updated with new chat
+ * messages.
+ * <p>
+ * To retrieve old messages, observe {@link #getOldMessages()} and call {@link #getNextPage()}
  * <p>
  * Sending messages: To send a chat message, use one of the following methods:
  * <p>
@@ -80,7 +84,7 @@ public class ChatMessageRepository {
         listenerRegistration = newMessageQuery(snapshot).addSnapshotListener(
             (querySnapshot, exception) -> {
                 if (exception != null) {
-                    Log.e(TAG, "Firestore error", exception);
+                    Log.e(TAG, "Database error", exception);
                     return;
                 }
 
@@ -151,7 +155,7 @@ public class ChatMessageRepository {
     }
 
     /**
-     *
+     * Fetches the next page of old messages, result is posted on {@link #getOldMessages()}.
      */
     public void getNextPage() {
         if (updating) {

@@ -33,8 +33,7 @@ public class LoginFragment extends Fragment {
                 firstTime = false;
             } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder
-                    .setTitle(R.string.login_alert_title)
+                builder.setTitle(R.string.login_alert_title)
                     .setMessage(R.string.login_alert_message)
                     .setPositiveButton(
                         R.string.login_alert_button_positive, (dialog, which) ->
