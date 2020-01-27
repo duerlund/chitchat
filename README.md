@@ -19,7 +19,7 @@ chatrooms: Collection
         imageReference: String
 ```
 
-The app assumes that there is a collection called chatrooms and with at least one document with the follow field set: 
+The app assumes that there is a collection called chatrooms and with at least one document with the following fields set: 
 
 - name
 - description
